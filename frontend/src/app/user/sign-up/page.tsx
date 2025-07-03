@@ -1,5 +1,5 @@
 "use client";
-import { SignUpCard } from "@/components/components/sign-up";
+import { SignUpCard } from "@/components/sign-up";
 
 export default function Home() {
   return (
@@ -7,7 +7,7 @@ export default function Home() {
       <SignUpCard />
       <div className="flex justify-center h-full p-5">
         <img
-          src="./signup-home.png"
+          src="../signup-home.png"
           alt="homepicture"
           className="flex h-full rounded-md "
         />

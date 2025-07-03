@@ -8,6 +8,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { ChevronLeft } from "lucide-react";
 import { useState, useEffect } from "react";
 
 const baseurl = "http://localhost:8000/";
@@ -36,6 +37,9 @@ export function SignUpCard() {
     <div className="flex items-center justify-center w-2/5 h-full">
       <Card className="w-full max-w-sm ">
         <CardHeader>
+          <div className="flex items-center border border-[#E4E4E7] rounded-md w-fit cursor-pointer p-2">
+            <ChevronLeft />
+          </div>
           <CardTitle className="mt-[30px] text-[24px]">
             Create your account
           </CardTitle>

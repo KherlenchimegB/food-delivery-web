@@ -1,5 +1,5 @@
 "use client";
-import { SignInCard } from "@/components/components/sign-in";
+import { SignInCard } from "@/components/sign-in";
 
 export default function Home() {
   return (

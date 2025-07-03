@@ -1,6 +1,9 @@
+"use client";
 import { ChevronRight, MapPin } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export const Navigation = () => {
+  const router = useRouter();
   return (
     <div className="w-full h-[68px] bg-black flex justify-between pl-[88px] pr-[88px] p-[10px]">
       <div className="flex gap-2 items-center">
@@ -18,10 +21,16 @@ export const Navigation = () => {
 
       <div className="flex gap-3 items-center text-[14px]">
         <AddressBar />
-        <button className="w-fit p-2 bg-white border rounded-full cursor-pointer">
+        <button
+          className="w-fit p-2 bg-white border rounded-full cursor-pointer"
+          onClick={() => router.push("/user/sign-up")}
+        >
           Sign up
         </button>
-        <button className="w-fit p-2 bg-[#EF4444] border border-none text-white rounded-full cursor-pointer">
+        <button
+          className="w-fit p-2 bg-[#EF4444] border border-none text-white rounded-full cursor-pointer"
+          onClick={() => router.push("/user/sign-in")}
+        >
           Log in
         </button>
       </div>
