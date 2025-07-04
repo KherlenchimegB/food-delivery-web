@@ -2,7 +2,7 @@
 import { ChevronRight, MapPin } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-export const Navigation = () => {
+export const NavigationMenu = () => {
   const router = useRouter();
   return (
     <div className="w-full h-[68px] bg-black flex justify-between pl-[88px] pr-[88px] p-[10px]">

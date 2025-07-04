@@ -1,5 +1,5 @@
 "use client";
-import { NewPassword } from "@/components/components/new-password";
+import { NewPassword } from "@/components/auth/new-password";
 
 export default function Home() {
   return (

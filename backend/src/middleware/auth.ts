@@ -1,4 +1,3 @@
-import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { User } from "../models/user.models.js";
 
@@ -11,7 +10,7 @@ const verifyToken = async (request: any, response: any, next: any) => {
 
   if (!token) return response.status(401).json({ error: "Access denied" });
 
-  if (user?.role === "User") {
+  if (user?.role === "USER") {
     try {
       const decoded: any = jwt.verify(token, "pinecone-test");
       request.userId = decoded.userId;

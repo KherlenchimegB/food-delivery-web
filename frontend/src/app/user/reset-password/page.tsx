@@ -3,7 +3,7 @@ import {
   ForgotPassword,
   VerifyEmail,
   ResetPassword,
-} from "@/components/components/reset-password";
+} from "@/components/reset-password";
 import { useState } from "react";
 
 export default function Home() {
