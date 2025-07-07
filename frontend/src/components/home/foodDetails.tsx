@@ -23,13 +23,17 @@ export const FoodDetails = ({
   ingredients: String;
 }) => {
   const [foodCount, setFoodCount] = useState(0);
-  const [totalPrice, SetTotalPrice] = useState(0);
+  const [totalPrice, setTotalPrice] = useState(0);
 
-  const handleAddClick = () => {
+  const handleAddClick = ({ price }: { price: Number }) => {
     setFoodCount((prevNumber) => prevNumber + 1);
+    setTotalPrice(price);
   };
   const handleMinusClick = () => {
     if (foodCount > 0) setFoodCount((prevNumber) => prevNumber - 1);
+  };
+  const totalPriceFood = ({ price }: { price: Number }) => {
+    setTotalPrice(foodCount * price);
   };
 
   return (
@@ -55,26 +59,27 @@ export const FoodDetails = ({
             <div className="flex justify-between items-center gap-4">
               <p className="text-wrap text-xs ">{ingredients}</p>
             </div>
-            <div className="gap-2">
-              <p className="text-wrap text-xs">Total price</p>
-              <span>₮{price.toString()}</span>
+            <div className="flex flex-row">
+              <div className="gap-2">
+                <p className="text-wrap text-xs">Total price</p>
+                <span>₮{totalPrice.toString()}</span>
+              </div>
+              <div className="flex">
+                <CircleMinus
+                  size={28}
+                  color="#000000"
+                  strokeWidth={0.75}
+                  onClick={handleMinusClick}
+                />
+                <span>{foodCount}</span>
+                <CirclePlus
+                  size={28}
+                  color="#000000"
+                  strokeWidth={0.75}
+                  onClick={handleAddClick}
+                />
+              </div>
             </div>
-            <div className="flex">
-              <CircleMinus
-                size={28}
-                color="#000000"
-                strokeWidth={0.75}
-                onClick={handleMinusClick}
-              />
-              <span>{foodCount}</span>
-              <CirclePlus
-                size={28}
-                color="#000000"
-                strokeWidth={0.75}
-                onClick={handleAddClick}
-              />
-            </div>
-
             <Button type="submit" className="w-full">
               Add to cart
             </Button>
