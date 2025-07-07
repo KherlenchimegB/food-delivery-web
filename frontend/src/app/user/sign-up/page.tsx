@@ -1,5 +1,5 @@
 "use client";
-import { SignUpCard } from "@/components/sign-up";
+import { SignUpCard } from "@/components/auth/sign-up";
 
 export default function Home() {
   return (
