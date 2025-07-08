@@ -49,8 +49,8 @@ export default function Home() {
       </div>
 
       <div className="flex flex-col gap-[54px] px-10 py-16">
-        {categoryData.map((category) => (
-          <div className="flex flex-col gap-[54px]" key={category.id}>
+        {categoryData.map((category, index) => (
+          <div className="flex flex-col gap-[54px]" key={category._id}>
             <h2 className="font-semibold text-3xl text-[#FFFFFF]">
               {category.categoryName}
             </h2>
@@ -59,10 +59,10 @@ export default function Home() {
                 .filter(
                   (food) => food.category.categoryName === category.categoryName
                 )
-                .map((food) => (
+                .map((food, index) => (
                   <HomeFoodCard
-                    key={food.id}
-                    id={food.id}
+                    key={food._id}
+                    id={food._id}
                     image={food.image}
                     foodName={food.foodName}
                     price={food.price}

@@ -17,14 +17,17 @@ export const HomeFoodCard = ({
   return (
     <div className="w-auto p-4 bg-white border-amber-300 rounded-xl m-[40px]">
       <div className="w-full h-full gap-6 border rounded-md relative">
-        <CldImage
-          src={image}
-          alt="food"
-          width="400"
-          height="240"
-          crop="fill"
-          className="w-full h-[240px]"
-        />
+        <div className="w-full h-[240px] border-none rounded-md">
+          <CldImage
+            src={image}
+            alt="food"
+            width="600"
+            height="240"
+            // fill={true}
+            crop="fill"
+            className="border-none rounded-md"
+          />
+        </div>
         <FoodDetails
           // key={id}
           id={id}

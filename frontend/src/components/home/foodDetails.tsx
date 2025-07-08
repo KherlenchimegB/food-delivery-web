@@ -1,12 +1,19 @@
 import { Button } from "@/components/ui/button";
-import { CldImage } from "next-cloudinary";
 import {
   Dialog,
   DialogContent,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { CircleMinus, CirclePlus } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { toast } from "sonner";
+import { Check, CircleMinus, CirclePlus } from "lucide-react";
+import { CldImage } from "next-cloudinary";
 import { useState } from "react";
 
 export const FoodDetails = ({
@@ -22,18 +29,13 @@ export const FoodDetails = ({
   price: Number;
   ingredients: String;
 }) => {
-  const [foodCount, setFoodCount] = useState(0);
-  const [totalPrice, setTotalPrice] = useState(0);
+  const [foodCount, setFoodCount] = useState(1);
 
-  const handleAddClick = ({ price }: { price: Number }) => {
+  const handleAddClick = () => {
     setFoodCount((prevNumber) => prevNumber + 1);
-    setTotalPrice(price);
   };
   const handleMinusClick = () => {
     if (foodCount > 0) setFoodCount((prevNumber) => prevNumber - 1);
-  };
-  const totalPriceFood = ({ price }: { price: Number }) => {
-    setTotalPrice(foodCount * price);
   };
 
   return (
@@ -59,12 +61,12 @@ export const FoodDetails = ({
             <div className="flex justify-between items-center gap-4">
               <p className="text-wrap text-xs ">{ingredients}</p>
             </div>
-            <div className="flex flex-row">
+            <div className="flex flex-row justify-between">
               <div className="gap-2">
                 <p className="text-wrap text-xs">Total price</p>
-                <span>₮{totalPrice.toString()}</span>
+                <span>₮{foodCount * price}</span>
               </div>
-              <div className="flex">
+              <div className="flex gap-1">
                 <CircleMinus
                   size={28}
                   color="#000000"
@@ -80,9 +82,40 @@ export const FoodDetails = ({
                 />
               </div>
             </div>
-            <Button type="submit" className="w-full">
+
+            {/* <Button type="submit" className="w-full">
               Add to cart
-            </Button>
+            </Button> */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="w-full  bg-black text-white"
+                >
+                  Add to cart
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-full" align="start">
+                <DropdownMenuLabel className="w-full bg-black text-white flex gap-1 border-none rounded-md">
+                  <Check /> Food is being added to the cart!
+                </DropdownMenuLabel>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {/* <Button
+              variant="outline"
+              onClick={() =>
+                toast("Food is being added to the cart!", {
+                  description: "Sunday, December 03, 2023 at 9:00 AM",
+                  action: {
+                    label: "Undo",
+                    onClick: () => console.log("Undo"),
+                  },
+                })
+              }
+            >
+              Add to cart
+            </Button> */}
           </div>
         </DialogContent>
       </form>

@@ -25,7 +25,7 @@ const signInSchema = yup.object({
     .required("Please must enter your email"),
   password: yup
     .string()
-    .min(8, "Please enter 8 characters long password")
+    .min(6, "Please enter 6 characters long password")
     .required("Please must enter your password"),
 });
 
