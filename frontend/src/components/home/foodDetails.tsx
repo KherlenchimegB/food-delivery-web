@@ -83,9 +83,6 @@ export const FoodDetails = ({
               </div>
             </div>
 
-            {/* <Button type="submit" className="w-full">
-              Add to cart
-            </Button> */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -101,21 +98,6 @@ export const FoodDetails = ({
                 </DropdownMenuLabel>
               </DropdownMenuContent>
             </DropdownMenu>
-
-            {/* <Button
-              variant="outline"
-              onClick={() =>
-                toast("Food is being added to the cart!", {
-                  description: "Sunday, December 03, 2023 at 9:00 AM",
-                  action: {
-                    label: "Undo",
-                    onClick: () => console.log("Undo"),
-                  },
-                })
-              }
-            >
-              Add to cart
-            </Button> */}
           </div>
         </DialogContent>
       </form>

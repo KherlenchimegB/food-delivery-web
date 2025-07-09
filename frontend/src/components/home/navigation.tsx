@@ -1,9 +1,13 @@
 "use client";
-import { ChevronRight, MapPin } from "lucide-react";
+import { ChevronRight, MapPin, User } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { AddToCart } from "./addToCard";
 
 export const NavigationMenu = () => {
   const router = useRouter();
+  // const handleAddToCart = () => {
+
+  // };
   return (
     <div className="w-full h-[68px] bg-black flex justify-between pl-[88px] pr-[88px] p-[10px]">
       <div className="flex gap-2 items-center">
@@ -32,6 +36,19 @@ export const NavigationMenu = () => {
           onClick={() => router.push("/user/sign-in")}
         >
           Log in
+        </button>
+
+        <AddToCart
+          id={""}
+          image={""}
+          foodName={""}
+          price={0}
+          ingredients={""}
+          userId={""}
+        />
+
+        <button className="w-fit p-2 bg-[#EF4444] border border-none text-white rounded-full cursor-pointer">
+          <User />
         </button>
       </div>
     </div>

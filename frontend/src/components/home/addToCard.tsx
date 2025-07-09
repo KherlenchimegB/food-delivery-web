@@ -1,87 +1,167 @@
-import { AppWindowIcon, CodeIcon } from "lucide-react";
+"use client";
 
+import * as React from "react";
+import { CircleMinus, CirclePlus, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useState } from "react";
 
-export const AddToCard = ({
+export const AddToCart = ({
   id,
   foodName,
   image,
   price,
   ingredients,
+  userId,
 }: {
   id: String;
   image: string;
   foodName: String;
   price: Number;
   ingredients: String;
+  userId: String;
+}) => {
+  const [foodCount, setFoodCount] = useState(1);
+
+  const handleAddClick = () => {
+    setFoodCount((prevNumber) => prevNumber + 1);
+  };
+  const handleMinusClick = () => {
+    if (foodCount > 0) setFoodCount((prevNumber) => prevNumber - 1);
+  };
+  return (
+    <Drawer>
+      <DrawerTrigger asChild>
+        <Button variant="outline" className="w-fit border rounded-full">
+          <ShoppingCart color="#ff0000" strokeWidth={1.25} />
+        </Button>
+      </DrawerTrigger>
+
+      <DrawerContent>
+        <div className="mx-auto w-[600px]">
+          <DrawerHeader className="flex flex-row items-center gap-10">
+            <ShoppingCart color="#ff0000" strokeWidth={1.25} />
+            <DrawerDescription>Order detail</DrawerDescription>
+            <DrawerClose asChild>
+              <Button
+                variant="outline"
+                className="w-fit border-black rounded-full "
+              >
+                X
+              </Button>
+            </DrawerClose>
+          </DrawerHeader>
+          <div className="flex w-full max-w-sm flex-col gap-6">
+            <Tabs defaultValue="cart">
+              <TabsList>
+                <TabsTrigger value="cart" className="w-1/2">
+                  Cart
+                </TabsTrigger>
+                <TabsTrigger value="Order" className="w-1/2">
+                  Order
+                </TabsTrigger>
+              </TabsList>
+              <TabsContent value="cart">
+                <Card>
+                  <CardHeader className="w-full">
+                    <CardTitle>My cart</CardTitle>
+                  </CardHeader>
+                  {/* <CardContent className="grid gap-6">
+               
+                  </CardContent> */}
+                  <div className="flex flex-col gap-4">
+                    <p className="text-red-500">{foodName}</p>
+                    <div className="flex justify-between items-center gap-4">
+                      <p className="text-wrap text-xs ">{ingredients}</p>
+                    </div>
+                    <div className="flex flex-row justify-between">
+                      <div className="gap-2">
+                        <p className="text-wrap text-xs">Total price</p>
+                        <span>
+                          {new Intl.NumberFormat("mn-MN", {
+                            style: "currency",
+                            currency: "MNT",
+                          }).format(foodCount * price)}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex gap-1">
+                      <CircleMinus
+                        size={28}
+                        color="#000000"
+                        strokeWidth={0.75}
+                        onClick={handleMinusClick}
+                      />
+                      <span>{foodCount}</span>
+                      <CirclePlus
+                        size={28}
+                        color="#000000"
+                        strokeWidth={0.75}
+                        onClick={handleAddClick}
+                      />
+                    </div>
+                  </div>
+                  <DrawerFooter>
+                    <p>Payment info</p>
+
+                    <Button className="bg-red-500 text-white rounded-[24px]">
+                      Checkout
+                    </Button>
+                  </DrawerFooter>
+                </Card>
+              </TabsContent>
+              <TabsContent value="Order">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Order history</CardTitle>
+                    <CardDescription>Order history</CardDescription>
+                  </CardHeader>
+                  <CardContent className="grid gap-6">
+                    <OrderHistory price={25000} status={"PENDING"} />
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
+          </div>
+        </div>
+      </DrawerContent>
+    </Drawer>
+  );
+};
+export const OrderHistory = ({
+  price,
+  status,
+  orderId,
+}: {
+  price: number;
+  status: string;
+  orderId: string;
 }) => {
   return (
-    <div className="flex w-full max-w-sm flex-col gap-6">
-      <Tabs defaultValue="account">
-        <TabsList>
-          <TabsTrigger value="account">Account</TabsTrigger>
-          <TabsTrigger value="password">Password</TabsTrigger>
-        </TabsList>
-        <TabsContent value="account">
-          <Card>
-            <CardHeader>
-              <CardTitle>Account</CardTitle>
-              <CardDescription>
-                Make changes to your account here. Click save when you&apos;re
-                done.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="grid gap-6">
-              <div className="grid gap-3">
-                <Label htmlFor="tabs-demo-name">Name</Label>
-                <Input id="tabs-demo-name" defaultValue="Pedro Duarte" />
-              </div>
-              <div className="grid gap-3">
-                <Label htmlFor="tabs-demo-username">Username</Label>
-                <Input id="tabs-demo-username" defaultValue="@peduarte" />
-              </div>
-            </CardContent>
-            <CardFooter>
-              <Button>Save changes</Button>
-            </CardFooter>
-          </Card>
-        </TabsContent>
-        <TabsContent value="password">
-          <Card>
-            <CardHeader>
-              <CardTitle>Password</CardTitle>
-              <CardDescription>
-                Change your password here. After saving, you&apos;ll be logged
-                out.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="grid gap-6">
-              <div className="grid gap-3">
-                <Label htmlFor="tabs-demo-current">Current password</Label>
-                <Input id="tabs-demo-current" type="password" />
-              </div>
-              <div className="grid gap-3">
-                <Label htmlFor="tabs-demo-new">New password</Label>
-                <Input id="tabs-demo-new" type="password" />
-              </div>
-            </CardContent>
-            <CardFooter>
-              <Button>Save password</Button>
-            </CardFooter>
-          </Card>
-        </TabsContent>
-      </Tabs>
+    <div className="w-full m-2.5">
+      <div className="flex justify-between items-center">
+        <div className="flex gap-5 font-bold">
+          <p>{price}</p>
+          <p>({orderId})</p>
+        </div>
+        <button className="border rounded-md ">{status}</button>
+      </div>
     </div>
   );
 };
