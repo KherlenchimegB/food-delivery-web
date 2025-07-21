@@ -10,13 +10,37 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
+import * as yup from "yup";
 
 const baseurl = "http://localhost:8000/";
 
-export function NewPassword() {
+const signUpSchema = yup.object({
+  password: yup
+    .string()
+    .min(6, "Please enter 6 characters long password")
+    .required("Please must enter your password"),
+  confirmPassword: yup
+    .string()
+    .min(6, "Please enter 6 characters long password")
+    .required("Please must enter your password"),
+});
+
+type NewPassFormData = yup.InferType<typeof signUpSchema>;
+
+export const NewPassword = () => {
+  const router = useRouter();
   const [inputPassword, setInputPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isHide, setIsHide] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<NewPassFormData>({
+    resolver: yupResolver(NewPassFormData), // connect with yup validation
+    mode: "onChange",
+  });
 
   function comparePassword(user: any): void {
     throw new Error("Function not implemented.");
@@ -70,16 +94,16 @@ export function NewPassword() {
                 </span>
               </div>
             </div>
+            <Button
+              type="submit"
+              className="w-full bg-gray-300"
+              // onClick={() => comparePassword(user)}
+            >
+              Let's Go
+            </Button>
           </form>
         </CardContent>
         <CardFooter className="flex-col gap-2">
-          <Button
-            type="submit"
-            className="w-full bg-gray-300"
-            // onClick={() => comparePassword(user)}
-          >
-            Let's Go
-          </Button>
           <div className="flex items-center">
             <span className="text-[#71717A]">Already have an account?</span>
             <Button variant="link" className="text-[#2563EB]">
@@ -90,4 +114,4 @@ export function NewPassword() {
       </Card>
     </div>
   );
-}
+};

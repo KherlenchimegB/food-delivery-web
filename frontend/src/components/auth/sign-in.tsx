@@ -31,7 +31,7 @@ const signInSchema = yup.object({
 
 type SignInFormData = yup.InferType<typeof signInSchema>; // typescript utility type
 
-export function SignInCard() {
+export const SignInCard = () => {
   const router = useRouter();
 
   const {
@@ -112,7 +112,7 @@ export function SignInCard() {
           </form>
         </CardContent>
         <CardFooter className="flex-col gap-2">
-          <div className="flex items-center">
+          <div className="flex items-center gap-2">
             <span className="text-[#71717A]">Don't have an account?</span>
             <Link href="/sign-up" className="text-primary hover:underline">
               Sign up
@@ -122,4 +122,4 @@ export function SignInCard() {
       </Card>
     </div>
   );
-}
+};

@@ -8,25 +8,51 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { yupResolver } from "@hookform/resolvers/yup";
 import { ChevronLeft } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import * as yup from "yup";
 
 const baseurl = "http://localhost:8000/";
 
-export function SignUpCard() {
-  const [inputEmail, setInputEmail] = useState("");
+const signUpSchema = yup.object({
+  email: yup
+    .string()
+    .email("Please enter a valid email address")
+    .required("Please must enter your email"),
+  // password: yup
+  //   .string()
+  //   .min(6, "Please enter 6 characters long password")
+  //   .required("Please must enter your password"),
+});
 
-  const createUser = async (user: any) => {
+type SignUpFormData = yup.InferType<typeof signUpSchema>; // typescript utility type
+
+export const SignUpCard = () => {
+  const router = useRouter();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<SignUpFormData>({
+    resolver: yupResolver(signUpSchema), // connect with yup validation
+    mode: "onChange",
+  });
+
+  const onSubmit = async (formData: SignUpFormData) => {
     try {
       const response = await fetch(`${baseurl}user/sign-up`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(user),
+        body: JSON.stringify(formData),
       });
       const responseData = await response.json();
-
+      router.push("/user/new-password");
       console.log("responseData", responseData);
     } catch (error) {
       console.log("error", error);
@@ -48,7 +74,7 @@ export function SignUpCard() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form>
+          <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
                 <Input
@@ -56,23 +82,21 @@ export function SignUpCard() {
                   type="email"
                   placeholder="Enter your email address"
                   required
-                  onChange={(event) => {
-                    setInputEmail(event.target.value);
-                  }}
-                  value={inputEmail}
+                  {...register("email")}
+                  className={`${errors.email ? " border border-red-400" : ""}`}
                 />
               </div>
             </div>
+            <Button
+              type="submit"
+              className="w-full bg-gray-300"
+              // onClick={() => createUser(user)}
+            >
+              Let's Go
+            </Button>
           </form>
         </CardContent>
         <CardFooter className="flex-col gap-2">
-          <Button
-            type="submit"
-            className="w-full bg-gray-300"
-            // onClick={() => createUser(user)}
-          >
-            Let's Go
-          </Button>
           <div className="flex items-center">
             <span>Already have an account?</span>
             <Button variant="link">Log in</Button>
@@ -81,4 +105,4 @@ export function SignUpCard() {
       </Card>
     </div>
   );
-}
+};

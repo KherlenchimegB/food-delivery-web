@@ -9,7 +9,7 @@ export const NavigationMenu = () => {
 
   // };
   return (
-    <div className="w-full h-[68px] bg-black flex justify-between pl-[88px] pr-[88px] p-[10px]">
+    <div className="w-full h-[68px] fixed top-0 z-50 bg-black flex justify-between pl-[88px] pr-[88px] p-[10px]">
       <div className="flex gap-2 items-center">
         <img src="./logos/home-logo.png" alt="logo" />
         <div className="flex-col">
@@ -38,12 +38,18 @@ export const NavigationMenu = () => {
           Log in
         </button>
 
+        {/* data map */}
+
         <AddToCart
           id={""}
-          image={""}
-          foodName={""}
-          price={0}
-          ingredients={""}
+          image={
+            "https://res.cloudinary.com/ddtytj1hq/image/upload/v1751622657/salad2_jfcs9t.png"
+          }
+          foodName={"Sunshine Stackers"}
+          price={25000}
+          ingredients={
+            "Fluffy pancakes stacked with fruits, cream, syrup, and powdered sugar."
+          }
           userId={""}
         />
 
