@@ -14,6 +14,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
+import { NewPassword } from "./new-password";
 
 const baseurl = "http://localhost:8000/";
 
@@ -22,16 +23,13 @@ const signUpSchema = yup.object({
     .string()
     .email("Please enter a valid email address")
     .required("Please must enter your email"),
-  // password: yup
-  //   .string()
-  //   .min(6, "Please enter 6 characters long password")
-  //   .required("Please must enter your password"),
 });
 
 type SignUpFormData = yup.InferType<typeof signUpSchema>; // typescript utility type
 
 export const SignUpCard = () => {
-  const router = useRouter();
+  // const router = useRouter();
+  const [step, setStep] = useState(1);
 
   const {
     register,
@@ -52,7 +50,8 @@ export const SignUpCard = () => {
         body: JSON.stringify(formData),
       });
       const responseData = await response.json();
-      router.push("/user/new-password");
+      if (step < 2) setStep(2);
+      // router.push("/user/new-password");
       console.log("responseData", responseData);
     } catch (error) {
       console.log("error", error);
@@ -61,48 +60,49 @@ export const SignUpCard = () => {
 
   return (
     <div className="flex items-center justify-center w-2/5 h-full">
-      <Card className="w-full max-w-sm ">
-        <CardHeader>
-          <div className="flex items-center border border-[#E4E4E7] rounded-md w-fit cursor-pointer p-2">
-            <ChevronLeft />
-          </div>
-          <CardTitle className="mt-[30px] text-[24px]">
-            Create your account
-          </CardTitle>
-          <CardDescription>
-            Sign up to explore your favorite dishes.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
-            <div className="flex flex-col gap-6">
-              <div className="grid gap-2">
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="Enter your email address"
-                  required
-                  {...register("email")}
-                  className={`${errors.email ? " border border-red-400" : ""}`}
-                />
-              </div>
+      {step === 1 && (
+        <Card className="w-full max-w-sm ">
+          <CardHeader>
+            <div className="flex items-center border border-[#E4E4E7] rounded-md w-fit cursor-pointer p-2">
+              <ChevronLeft />
             </div>
-            <Button
-              type="submit"
-              className="w-full bg-gray-300"
-              // onClick={() => createUser(user)}
-            >
-              Let's Go
-            </Button>
-          </form>
-        </CardContent>
-        <CardFooter className="flex-col gap-2">
-          <div className="flex items-center">
-            <span>Already have an account?</span>
-            <Button variant="link">Log in</Button>
-          </div>
-        </CardFooter>
-      </Card>
+            <CardTitle className="mt-[30px] text-[24px]">
+              Create your account
+            </CardTitle>
+            <CardDescription>
+              Sign up to explore your favorite dishes.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
+              <div className="flex flex-col gap-6">
+                <div className="grid gap-2">
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="Enter your email address"
+                    required
+                    {...register("email")}
+                    className={`${
+                      errors.email ? " border border-red-400" : ""
+                    }`}
+                  />
+                </div>
+              </div>
+              <Button type="submit" className="w-full bg-gray-300">
+                Let's Go
+              </Button>
+            </form>
+          </CardContent>
+          <CardFooter className="flex-col gap-2">
+            <div className="flex items-center">
+              <span>Already have an account?</span>
+              <Button variant="link">Log in</Button>
+            </div>
+          </CardFooter>
+        </Card>
+      )}
+      {step === 2 && <NewPassword />}
     </div>
   );
 };

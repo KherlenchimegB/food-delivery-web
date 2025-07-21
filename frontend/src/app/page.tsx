@@ -3,6 +3,7 @@ import { HomeFoodCard } from "@/components/home/homeFoodCard";
 import { NavigationMenu } from "@/components/home/navigation";
 import { useEffect, useState } from "react";
 import { CldUploadButton, CldImage } from "next-cloudinary";
+import { Footer } from "@/components/home/footer";
 
 const baseurl = "http://localhost:8000/";
 
@@ -73,6 +74,7 @@ export default function Home() {
           </div>
         ))}
       </div>
+      <Footer />
     </div>
   );
 }

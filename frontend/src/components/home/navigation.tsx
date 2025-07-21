@@ -25,12 +25,14 @@ export const NavigationMenu = () => {
 
       <div className="flex gap-3 items-center text-[14px]">
         <AddressBar />
+
         <button
           className="w-fit p-2 bg-white border rounded-full cursor-pointer"
           onClick={() => router.push("/user/sign-up")}
         >
           Sign up
         </button>
+
         <button
           className="w-fit p-2 bg-[#EF4444] border border-none text-white rounded-full cursor-pointer"
           onClick={() => router.push("/user/sign-in")}

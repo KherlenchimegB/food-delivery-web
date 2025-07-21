@@ -39,24 +39,32 @@ const baseurl = "http://localhost:8000/";
 
 const data: Payment[] = [
   {
-    id: "m5gr84i9",
+    _id: "685925155b7e2aa757b061a9",
+    user: "6858e72b4a757747ad4e6f17",
     amount: 316,
     status: "CANCELED",
     email: "ken99@example.com",
-  },
-  {
-    id: "3u1reuv4",
-    amount: 242,
-    status: "PENDING",
-    email: "Abe45@example.com",
+    foodOrderItems: [
+      { foodId: "68527bc3c6e83776b3b2a525", quantity: 4 },
+      { foodId: "685925155b7e2aa757b061aa", quantity: 2 },
+    ],
+    foodImage:
+      "https://res.cloudinary.com/ddtytj1hq/image/upload/v1751622574/Food_hqfdux.png",
+    foodName: "Finger food",
+    deliveryAddress: "BGD, Altai hothon, 12-17 toot",
   },
 ];
 
 export type Payment = {
-  id: string;
+  _id: string;
+  user: string;
+  foodOrderItems: [{ foodId: string; quantity: number }];
   amount: number;
   status: "PENDING" | "CANCELED" | "DELIVERED";
   email: string;
+  foodImage: string;
+  foodName: string;
+  deliveryAddress: string;
 };
 
 export const columns: ColumnDef<Payment>[] = [
@@ -82,13 +90,7 @@ export const columns: ColumnDef<Payment>[] = [
     enableSorting: false,
     enableHiding: false,
   },
-  {
-    accessorKey: "status",
-    header: "Status",
-    cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("status")}</div>
-    ),
-  },
+
   {
     accessorKey: "email",
     header: ({ column }) => {
@@ -97,7 +99,7 @@ export const columns: ColumnDef<Payment>[] = [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Email
+          Customer
           <ArrowUpDown />
         </Button>
       );
@@ -118,6 +120,13 @@ export const columns: ColumnDef<Payment>[] = [
 
       return <div className="text-right font-medium">{formatted}</div>;
     },
+  },
+  {
+    accessorKey: "status",
+    header: "Status",
+    cell: ({ row }) => (
+      <div className="capitalize">{row.getValue("status")}</div>
+    ),
   },
   {
     id: "actions",
