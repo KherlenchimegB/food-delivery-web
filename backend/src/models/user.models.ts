@@ -9,7 +9,7 @@ const user = new Schema({
     unique: true,
   },
   password: { type: String, required: [true, "Please enter password!"] },
-  phoneNumber: { type: String, required: true },
+  phoneNumber: { type: String },
   address: String,
   role: {
     type: String,

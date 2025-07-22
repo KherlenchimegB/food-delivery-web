@@ -33,7 +33,6 @@ type SignInFormData = yup.InferType<typeof signInSchema>; // typescript utility 
 
 export const SignInCard = () => {
   const router = useRouter();
-
   const {
     register,
     handleSubmit,
@@ -102,7 +101,6 @@ export const SignInCard = () => {
             <Button type="submit" className="w-full bg-gray-300">
               Let's Go
             </Button>
-
             <Link
               href="reset-password"
               className=" text-sm underline-offset-4 hover:underline text-[#71717A]"
@@ -114,7 +112,7 @@ export const SignInCard = () => {
         <CardFooter className="flex-col gap-2">
           <div className="flex items-center gap-2">
             <span className="text-[#71717A]">Don't have an account?</span>
-            <Link href="/sign-up" className="text-primary hover:underline">
+            <Link href="/user/sign-up" className="text-primary hover:underline">
               Sign up
             </Link>
           </div>

@@ -1,10 +1,3 @@
-"use client";
-
-import { DataTable } from "@/components/admin/adminOrderTable";
-
-import { useState } from "react";
-import { LayoutDashboard, Truck } from "lucide-react";
-
 import {
   Sidebar,
   SidebarContent,
@@ -14,15 +7,10 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/components/ui/sidebar";
-import { FoodMenu } from "@/components/admin/foodmenu";
+} from "../ui/sidebar";
+import { LayoutDashboard, Truck } from "lucide-react";
 
-export default function Home() {
-  const [select, setSelect] = useState(1);
-  const handleSelect = () => {
-    if (select === 1) setSelect(2);
-    else setSelect(1);
-  };
+export const AppSidebar = () => {
   return (
     <div>
       <Sidebar>
@@ -42,14 +30,9 @@ export default function Home() {
             <SidebarGroupContent>
               <SidebarMenu className="pt-3 gap-4">
                 <SidebarMenuItem>
-                  <SidebarMenuButton
-                    asChild
-                    className={`rounded-full text-xl ${
-                      select === 2 ? "bg-black text-white" : "bg-white"
-                    }`}
-                  >
+                  <SidebarMenuButton asChild>
                     {/* <a href={"/admin/menu"}> */}
-                    <button onClick={handleSelect}>
+                    <button>
                       <LayoutDashboard size={40} strokeWidth={2} />
                       Food menu
                     </button>
@@ -57,13 +40,8 @@ export default function Home() {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
-                  <SidebarMenuButton
-                    asChild
-                    className={`rounded-full text-xl ${
-                      select === 1 ? "bg-black text-white" : "bg-white"
-                    }`}
-                  >
-                    <button onClick={handleSelect}>
+                  <SidebarMenuButton asChild>
+                    <button>
                       <Truck size={40} strokeWidth={2} />
                       Order
                     </button>
@@ -74,8 +52,6 @@ export default function Home() {
           </SidebarGroup>
         </SidebarContent>
       </Sidebar>
-      {select === 1 && <DataTable />}
-      {/* {select === 2 && <FoodMenu />} */}
     </div>
   );
-}
+};
