@@ -16,6 +16,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { FoodMenu } from "@/components/admin/foodMenu";
+import { CategoryNames } from "@/components/admin/categoryNames";
 
 export default function Home() {
   const [select, setSelect] = useState(1);
@@ -75,6 +76,7 @@ export default function Home() {
         </SidebarContent>
       </Sidebar>
       {select === 1 && <DataTable />}
+      {select === 2 && <CategoryNames />}
       {select === 2 && <FoodMenu />}
     </div>
   );

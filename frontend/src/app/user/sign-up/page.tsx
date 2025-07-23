@@ -47,21 +47,19 @@ export default function SignUpPage() {
   });
 
   const onSubmit = async (formData: SignUpFormData) => {
-    if (formData.password === formData.confirmPassword) {
-      try {
-        const response = await fetch(`${baseurl}user/sign-up`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formData),
-        });
-        const responseData = await response.json();
-        router.push("/");
-      } catch (error) {
-        console.log("error", error);
-      }
-    } else console.log("Password not exist");
+    try {
+      const response = await fetch(`${baseurl}user/sign-up`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+      const responseData = await response.json();
+      router.push("/");
+    } catch (error) {
+      console.log("error", error);
+    }
   };
 
   const onBack = () => router.push("/");

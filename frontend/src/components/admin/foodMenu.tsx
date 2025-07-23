@@ -1,6 +1,7 @@
 "use client";
 import { HomeFoodCard } from "@/components/home/homeFoodCard";
 import { useEffect, useState } from "react";
+import { AddDishesButton } from "./addDishesButton";
 
 const baseurl = "http://localhost:8000/";
 
@@ -41,8 +42,14 @@ export const FoodMenu = () => {
             className="flex flex-col bg-white border rounded-md"
             key={category._id}
           >
-            <h2 className="font-semibold text-3xl ">{category.categoryName}</h2>
+            <h2 className="font-semibold text-3xl p-6">
+              {category.categoryName}
+            </h2>
             <div className="grid grid-cols-3 ">
+              <div className="w-full h-auto gap-5 p-5 m-4 border border-red-500 rounded-md flex flex-col justify-center items-center">
+                <AddDishesButton />
+                <span className="text-2xl">Add new Dish to Appetizers</span>
+              </div>
               {foodData
                 .filter(
                   (food) => food.category.categoryName === category.categoryName

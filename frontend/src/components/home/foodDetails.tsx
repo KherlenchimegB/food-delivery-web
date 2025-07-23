@@ -11,7 +11,6 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { toast } from "sonner";
 import { Check, CircleMinus, CirclePlus } from "lucide-react";
 import { CldImage } from "next-cloudinary";
 import { useState } from "react";
@@ -42,7 +41,9 @@ export const FoodDetails = ({
     <Dialog>
       <form>
         <DialogTrigger asChild>
-          <Button variant="outline">+</Button>
+          <Button variant="outline" className="">
+            +
+          </Button>
         </DialogTrigger>
         <DialogContent className="w-[640px] flex items-center">
           <div className="grid gap-4">
@@ -52,7 +53,7 @@ export const FoodDetails = ({
               width="300"
               height="300"
               crop="fill"
-              className="w-[300px] h-[240px]"
+              className="w-[300px] h-auto"
             />
           </div>
 
