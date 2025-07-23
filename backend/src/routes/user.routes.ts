@@ -9,9 +9,9 @@ import verifyToken from "../middleware/auth.js";
 
 const userRouter = express.Router();
 
-userRouter.get("/refresh", refresh);
-userRouter.post("/sign-in", signIn);
+userRouter.get("/refresh", verifyToken, refresh);
+userRouter.post("/sign-in", verifyToken, signIn);
 userRouter.post("/sign-up", signUp);
-userRouter.post("/:userId", updateUser);
+userRouter.post("/:userId", verifyToken, updateUser);
 
 export default userRouter;

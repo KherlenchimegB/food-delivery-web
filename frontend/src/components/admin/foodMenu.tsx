@@ -34,19 +34,20 @@ export const FoodMenu = () => {
   };
 
   return (
-    <div className="flex w-screen flex-col bg-[#404040]">
-      <div className="flex flex-col gap-[54px] px-10 py-16">
-        {categoryData.map((category, index) => (
-          <div className="flex flex-col gap-[54px]" key={category._id}>
-            <h2 className="font-semibold text-3xl text-[#FFFFFF]">
-              {category.categoryName}
-            </h2>
-            <div className="grid grid-cols-3 gap-9">
+    <div className="flex w-screen flex-col bg-[#F4F4F5]">
+      <div className="flex flex-col px-6 py-6 gap-4">
+        {categoryData.map((category) => (
+          <div
+            className="flex flex-col bg-white border rounded-md"
+            key={category._id}
+          >
+            <h2 className="font-semibold text-3xl ">{category.categoryName}</h2>
+            <div className="grid grid-cols-3 ">
               {foodData
                 .filter(
                   (food) => food.category.categoryName === category.categoryName
                 )
-                .map((food, index) => (
+                .map((food) => (
                   <HomeFoodCard
                     key={food._id}
                     id={food._id}
@@ -54,6 +55,7 @@ export const FoodMenu = () => {
                     foodName={food.foodName}
                     price={food.price}
                     ingredients={food.ingredients}
+                    isHome={false}
                   />
                 ))}
             </div>

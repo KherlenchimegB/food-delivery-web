@@ -7,40 +7,42 @@ export const HomeFoodCard = ({
   image,
   price,
   ingredients,
+  isHome,
 }: {
   id: String;
   image: string;
   foodName: String;
   price: Number;
   ingredients: String;
+  isHome: Boolean;
 }) => {
   return (
-    <div className="w-auto p-4 bg-white border-amber-300 rounded-xl m-[40px]">
-      <div className="w-full h-full gap-6 border rounded-md relative">
-        <div className="w-full h-[240px] border-none rounded-md">
+    <div className="w-auto p-4 bg-white border rounded-xl m-[20px] gap-5">
+      <div className="w-full h-auto gap-2 border-none rounded-md relative">
+        <div className="w-full h-auto border-none rounded-md">
           <CldImage
             src={image}
             alt="food"
             width="600"
             height="240"
-            // fill={true}
             crop="fill"
             className="border-none rounded-md"
           />
         </div>
-        <FoodDetails
-          // key={id}
-          id={id}
-          image={image}
-          foodName={foodName}
-          price={price}
-          ingredients={ingredients}
-        />
-        <div className="flex justify-between items-center p-[20px]">
+        {isHome && (
+          <FoodDetails
+            id={id}
+            image={image}
+            foodName={foodName}
+            price={price}
+            ingredients={ingredients}
+          />
+        )}
+        <div className="flex justify-between items-center">
           <span>{foodName}</span>
           <span>{price.toString()}</span>
         </div>
-        <p className="text-wrap text-xs m-[20px]">{ingredients}</p>
+        <p className="text-wrap text-xs">{ingredients}</p>
       </div>
     </div>
   );

@@ -52,8 +52,10 @@ export const SignInCard = () => {
         body: JSON.stringify(formData),
       });
       const responseData = await response.json();
-      router.push("/");
       console.log("responseData", responseData);
+
+      if (responseData?.role === "ADMIN") router.push("/admin");
+      else router.push("/");
     } catch (error) {
       console.log("error", error);
     }
