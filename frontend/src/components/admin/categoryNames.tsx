@@ -35,12 +35,10 @@ export const CategoryNames = () => {
 
   const count = (category: any) => {
     let countCategory = 0;
-
     foodData
       .filter((food) => food.category.categoryName === category.categoryName)
       .map((food) => countCategory++);
     console.log("countCategory", countCategory);
-
     return countCategory;
   };
 
@@ -51,10 +49,10 @@ export const CategoryNames = () => {
         {categoryData.map((category) => (
           <div>
             <div
-              className="flex border rounded-full text-xl p-2 gap-2"
+              className="flex border rounded-full text-xl p-2 gap-2 w-fit"
               key={category._id}
             >
-              <p>{category.categoryName}</p>
+              <span>{category.categoryName}</span>
               <div className="flex bg-black border rounded-full w-[30px] h-[30px] text-white items-center justify-center">
                 {count(category)}
               </div>

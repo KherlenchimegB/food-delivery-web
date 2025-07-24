@@ -46,7 +46,7 @@ export const FoodMenu = () => {
               {category.categoryName}
             </h2>
             <div className="grid grid-cols-3 ">
-              <div className="w-full h-auto gap-5 p-5 m-4 border border-red-500 rounded-md flex flex-col justify-center items-center">
+              <div className="w-auto h-auto gap-5 p-5 m-5 border-5 border-red-500 border-dashed rounded-md flex flex-col justify-center items-center">
                 <AddDishesButton />
                 <span className="text-2xl">Add new Dish to Appetizers</span>
               </div>
@@ -63,6 +63,7 @@ export const FoodMenu = () => {
                     price={food.price}
                     ingredients={food.ingredients}
                     isHome={false}
+                    categoryName={""}
                   />
                 ))}
             </div>
