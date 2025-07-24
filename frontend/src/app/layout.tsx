@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { UserContextProvider } from "@/context/userContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,26 +24,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
-      </body>
-    </html>
+    <UserContextProvider>
+      <html lang="en">
+        <body
+          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        >
+          {children}
+        </body>
+      </html>
+    </UserContextProvider>
   );
 }
-// export async function Layout({ children }: { children: React.ReactNode }) {
-//   const cookieStore = await cookies();
-//   const defaultOpen = cookieStore.get("sidebar_state")?.value === "true";
-
-//   return (
-//     <SidebarProvider defaultOpen={defaultOpen}>
-//       <AppSidebar />
-//       <main>
-//         <SidebarTrigger />
-//         {children}
-//       </main>
-//     </SidebarProvider>
-//   );
-// }

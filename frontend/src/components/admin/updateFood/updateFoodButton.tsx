@@ -9,31 +9,17 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { cn } from "@/lib/utils";
-
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-
 import { Input } from "@/components/ui/input";
-import { Textarea } from "../ui/textarea";
+import { Textarea } from "../../ui/textarea";
 import * as yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 // import axios from "axios";
-import { Check, ChevronsUpDown, PencilLine } from "lucide-react";
+import { PencilLine } from "lucide-react";
 import { useEffect, useState } from "react";
 import React from "react";
+import { CategoryDropDownMenu } from "./categoryDropDown";
+import { DeleteFoodButton } from "./deleteFoodButton";
 const baseurl = "http://localhost:8000/";
 
 const addDishSchema = yup.object({
@@ -70,24 +56,10 @@ export const UpdateDishButton = ({
     mode: "onChange",
   });
   const [foodData, setFoodData] = useState<any[]>([]);
-  const [categoryData, setCategoryData] = useState<any[]>([]);
-  const [open, setOpen] = React.useState(false);
-  const [value, setValue] = React.useState("");
 
   useEffect(() => {
-    fetchCategories();
     fetchFoods();
   }, []);
-
-  const fetchCategories = async () => {
-    try {
-      const response = await fetch(`${baseurl}food-category`);
-      const responseData = await response.json();
-      setCategoryData(responseData.data);
-    } catch (error) {
-      console.log("Error fetching category:", error);
-    }
-  };
 
   const fetchFoods = async () => {
     try {
@@ -98,6 +70,7 @@ export const UpdateDishButton = ({
       console.log("Error fetching food:", error);
     }
   };
+
   const onSubmit = async (formData: AddDishFormData) => {
     console.log("ajillalaa");
     try {
@@ -134,99 +107,55 @@ export const UpdateDishButton = ({
           </DialogHeader>
           <div className="flex flex-col gap-4">
             <div className="flex justify-between">
-              <span>Dish name</span>
+              <span className="text-xs text-[#7171A]">Dish name</span>
               <Input
                 {...register("foodName")}
                 id="foodName"
                 name="foodName"
                 placeholder={`${foodName}`}
                 className={`${
-                  errors.foodName ? " w-1/2 border border-red-400" : " w-1/2"
+                  errors.foodName ? " w-2/3 border border-red-400" : " w-2/3"
                 }`}
               />
             </div>
-            <div className="flex justify-between">
-              <span>Dish category</span>
-              <Popover open={open} onOpenChange={setOpen}>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    role="combobox"
-                    aria-expanded={open}
-                    className="w-[200px] justify-between"
-                  >
-                    {value
-                      ? categoryData.find(
-                          (categoryData) => categoryData.value === value
-                        )?.label
-                      : "Select category..."}
-                    <ChevronsUpDown className="opacity-50" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-[200px] p-0">
-                  <Command>
-                    <CommandInput
-                      placeholder="Search framework..."
-                      className="h-9"
-                    />
-                    <CommandList>
-                      <CommandEmpty>No data found.</CommandEmpty>
-                      <CommandGroup>
-                        {categoryData.map((category) => (
-                          <CommandItem
-                            key={category.value}
-                            value={category.categoryName}
-                            onSelect={(currentValue) => {
-                              setValue(
-                                currentValue === value ? "" : currentValue
-                              );
-                              setOpen(false);
-                            }}
-                          >
-                            {category.label}
-                            <Check
-                              className={cn(
-                                "ml-auto",
-                                value === category.value
-                                  ? "opacity-100"
-                                  : "opacity-0"
-                              )}
-                            />
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
-                </PopoverContent>
-              </Popover>
-              {/* {categoryData.map((category) => (
-                <SelectGroup>
-                  <SelectItem value="apple" key={category._id}>
-                    {category.categoryName}
-                  </SelectItem>
-                </SelectGroup>
-              ))} */}
-            </div>
+            <CategoryDropDownMenu id={id} categoryName={categoryName} />
 
             <div className="flex gap-3 justify-between">
-              <span>Ingredients</span>
+              <span className="text-xs text-[#7171A]">Ingredients</span>
               <Textarea
+                className="w-2/3"
                 placeholder={`${ingredients}`}
                 {...register("ingredients")}
               />
             </div>
 
+            <div className="flex gap-3 justify-between">
+              <span className="text-xs text-[#7171A]">Price</span>
+              <Input
+                {...register("price")}
+                id="price"
+                name="price"
+                placeholder={`${price}`}
+                className={`${
+                  errors.price ? " w-4/5 border border-red-400" : " w-2/3"
+                }`}
+              />
+            </div>
+
             <div className="flex w-full gap-3 justify-between">
-              <span>Image</span>
+              <span className="text-xs text-[#7171A]">Image</span>
               <img
                 src={`${image}`}
                 alt="food image"
-                className="w-[300px] h-45 border rounded-md"
+                className="w-full h-45 border rounded-md"
               />
             </div>
           </div>
           <DialogFooter>
-            <Button type="submit">Save changes</Button>
+            <div className="w-full flex justify-between">
+              <DeleteFoodButton />
+              <Button type="submit">Save changes</Button>
+            </div>
           </DialogFooter>
         </DialogContent>
       </form>

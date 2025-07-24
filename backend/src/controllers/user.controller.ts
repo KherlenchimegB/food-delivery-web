@@ -91,3 +91,21 @@ export const updateUser = async (request: Request, response: Response) => {
     });
   }
 };
+
+export const getUser = async (request: Request, response: Response) => {
+  try {
+    const { email } = request.body;
+    const user = await User.findOne({ email });
+
+    response.status(200).json({
+      success: true,
+      email: user?.email,
+      role: user?.role,
+    });
+  } catch (error) {
+    response.status(444).json({
+      success: false,
+      error: error,
+    });
+  }
+};

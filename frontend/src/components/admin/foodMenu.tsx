@@ -63,7 +63,7 @@ export const FoodMenu = () => {
                     price={food.price}
                     ingredients={food.ingredients}
                     isHome={false}
-                    categoryName={""}
+                    categoryName={food.category.categoryName}
                   />
                 ))}
             </div>

@@ -1,6 +1,6 @@
 import { CldImage } from "next-cloudinary";
 import { FoodDetails } from "./foodDetails";
-import { UpdateDishButton } from "../admin/updateFoodButton";
+import { UpdateDishButton } from "../admin/updateFood/updateFoodButton";
 
 export const HomeFoodCard = ({
   id,
