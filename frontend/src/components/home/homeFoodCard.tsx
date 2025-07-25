@@ -47,6 +47,7 @@ export const HomeFoodCard = ({
           <span>{price.toString()}</span>
         </div>
         <p className="text-wrap text-xs">{ingredients}</p>
+
         {!isHome && (
           <UpdateDishButton
             id={id}

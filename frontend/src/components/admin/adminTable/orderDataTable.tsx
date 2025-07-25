@@ -11,21 +11,10 @@ import {
   getSortedRowModel,
   SortingState,
   useReactTable,
-  VisibilityState,
 } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react";
-
+import { ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import {
   Table,
@@ -35,6 +24,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { DeliveryStatusDropDownButton } from "./statusDropDownButton";
+import { DataFoodListShow } from "./dataFoodListButton";
+import { count } from "console";
 
 const data: Payment[] = [
   {
@@ -50,10 +42,30 @@ const data: Payment[] = [
           "https://res.cloudinary.com/ddtytj1hq/image/upload/v1751622625/food4_lngefv.png",
       },
     ],
+
     date: "2025-06-26",
     amount: 70000, //total
     address: "BGD 24-8-101",
     status: "PENDING",
+  },
+  {
+    id: "685925155b7e2aa757b061a9",
+    email: "bataa@gmail.com",
+    food: [
+      {
+        id: "68527cbff6e759b7ded59fac",
+        foodName: "Brie Crostini Appetizer",
+        count: 2,
+        price: 25000,
+        image:
+          "https://res.cloudinary.com/ddtytj1hq/image/upload/v1751622625/food4_lngefv.png",
+      },
+    ],
+
+    date: "2025-05-26",
+    amount: 50000,
+    address: "BGD 24-8-101",
+    status: "DELIVERED",
   },
 ];
 
@@ -115,10 +127,38 @@ export const columns: ColumnDef<Payment>[] = [
   },
   {
     accessorKey: "food",
-    header: () => <div className="text-right">Foods</div>,
+    header: () => <div className="text-left">Foods</div>,
     cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("food.foodName")}</div>
+      <div className="flex justify-start capitalize w-40 gap-5  ">
+        {/* backendees data oruulah */}
+        <DataFoodListShow
+          image={
+            "https://res.cloudinary.com/ddtytj1hq/image/upload/v1751622625/food4_lngefv.png"
+          }
+          foodName={"Brie Crostini Appetizer"}
+          count={2}
+        />
+        <div>
+          {/* {row.getValue("food")}  */}
+          foods
+        </div>
+      </div>
     ),
+  },
+  {
+    accessorKey: "date",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Date
+          <ArrowUpDown />
+        </Button>
+      );
+    },
+    cell: ({ row }) => <div className="capitalize">{row.getValue("date")}</div>,
   },
   {
     accessorKey: "amount",
@@ -129,16 +169,34 @@ export const columns: ColumnDef<Payment>[] = [
         style: "currency",
         currency: "MNT",
       }).format(amount);
-
       return <div className="text-right font-medium">{formatted}</div>;
     },
   },
-
+  {
+    accessorKey: "address",
+    header: () => <div className="text-center">Delivery address</div>,
+    cell: ({ row }) => (
+      <div className="capitalize">{row.getValue("address")}</div>
+    ),
+  },
   {
     accessorKey: "status",
-    header: "Status",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Delivery state
+          <ArrowUpDown />
+        </Button>
+      );
+    },
     cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("status")}</div>
+      <div className="flex justify-between capitalize w-40 gap-5 border px-2 rounded-full">
+        {row.getValue("status")}
+        <DeliveryStatusDropDownButton />
+      </div>
     ),
   },
 ];
@@ -148,8 +206,7 @@ export const OrderDataTable = () => {
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
+
   const [rowSelection, setRowSelection] = React.useState({});
 
   const table = useReactTable({
@@ -161,12 +218,10 @@ export const OrderDataTable = () => {
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    // onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
     state: {
       sorting,
       columnFilters,
-      //   columnVisibility,
       rowSelection,
     },
   });
@@ -176,7 +231,9 @@ export const OrderDataTable = () => {
       <div className="flex justify-between w-full m-5 h-[60px] border rounded-md p-2">
         <div className="flex flex-col items-center">
           <h1 className="font-bold">Orders</h1>
-          <span className="text-xs">32 items</span>
+          <span className="text-xs">
+            {table.getFilteredRowModel().rows.length} items
+          </span>
         </div>
         <div className="flex items-center py-4">
           <Input
