@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+
 import * as React from "react";
 import {
   ColumnDef,
@@ -14,6 +14,7 @@ import {
   VisibilityState,
 } from "@tanstack/react-table";
 import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -34,37 +35,44 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { OrderDatePicker } from "./datepicker";
-const baseurl = "http://localhost:8000/";
 
 const data: Payment[] = [
   {
-    _id: "685925155b7e2aa757b061a9",
-    user: "6858e72b4a757747ad4e6f17",
-    amount: 316,
-    status: "CANCELED",
-    email: "ken99@example.com",
-    foodOrderItems: [
-      { foodId: "68527bc3c6e83776b3b2a525", quantity: 4 },
-      { foodId: "685925155b7e2aa757b061aa", quantity: 2 },
+    id: "685925155b7e2aa757b061a9",
+    email: "bold10@gmail.com",
+    food: [
+      {
+        id: "68527cbff6e759b7ded59fac",
+        foodName: "Brie Crostini Appetizer",
+        count: 2,
+        price: 35000,
+        image:
+          "https://res.cloudinary.com/ddtytj1hq/image/upload/v1751622625/food4_lngefv.png",
+      },
     ],
-    foodImage:
-      "https://res.cloudinary.com/ddtytj1hq/image/upload/v1751622574/Food_hqfdux.png",
-    foodName: "Finger food",
-    deliveryAddress: "BGD, Altai hothon, 12-17 toot",
+    date: "2025-06-26",
+    amount: 70000, //total
+    address: "BGD 24-8-101",
+    status: "PENDING",
   },
 ];
 
 export type Payment = {
-  _id: string;
-  user: string;
-  foodOrderItems: [{ foodId: string; quantity: number }];
-  amount: number;
-  status: "PENDING" | "CANCELED" | "DELIVERED";
+  id: string;
   email: string;
-  foodImage: string;
-  foodName: string;
-  deliveryAddress: string;
+  food: [
+    {
+      id: string;
+      foodName: string;
+      count: number;
+      price: number;
+      image: string;
+    }
+  ];
+  date: string;
+  amount: number; //total
+  address: string;
+  status: "PENDING" | "CANCELED" | "DELIVERED";
 };
 
 export const columns: ColumnDef<Payment>[] = [
@@ -90,7 +98,6 @@ export const columns: ColumnDef<Payment>[] = [
     enableSorting: false,
     enableHiding: false,
   },
-
   {
     accessorKey: "email",
     header: ({ column }) => {
@@ -107,12 +114,17 @@ export const columns: ColumnDef<Payment>[] = [
     cell: ({ row }) => <div className="lowercase">{row.getValue("email")}</div>,
   },
   {
+    accessorKey: "food",
+    header: () => <div className="text-right">Foods</div>,
+    cell: ({ row }) => (
+      <div className="capitalize">{row.getValue("food.foodName")}</div>
+    ),
+  },
+  {
     accessorKey: "amount",
     header: () => <div className="text-right">Total</div>,
     cell: ({ row }) => {
       const amount = parseFloat(row.getValue("amount"));
-
-      // Format the amount as a dollar amount
       const formatted = new Intl.NumberFormat("mn-MN", {
         style: "currency",
         currency: "MNT",
@@ -121,6 +133,7 @@ export const columns: ColumnDef<Payment>[] = [
       return <div className="text-right font-medium">{formatted}</div>;
     },
   },
+
   {
     accessorKey: "status",
     header: "Status",
@@ -128,54 +141,9 @@ export const columns: ColumnDef<Payment>[] = [
       <div className="capitalize">{row.getValue("status")}</div>
     ),
   },
-  {
-    id: "actions",
-    enableHiding: false,
-    cell: ({ row }) => {
-      const payment = row.original;
-
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(payment.id)}
-            >
-              Copy payment ID
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>View customer</DropdownMenuItem>
-            <DropdownMenuItem>View payment details</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
-    },
-  },
 ];
 
-export const DataTable = () => {
-  const [orderData, setOrderData] = useState<any[]>([]);
-  useEffect(() => {
-    fetchOrders();
-  }, [orderData]);
-
-  const fetchOrders = async () => {
-    try {
-      const response = await fetch(`${baseurl}/:userId`);
-      const responseData = await response.json();
-      setOrderData(responseData.data);
-    } catch (error) {
-      console.log("Error fetching orders:", error);
-    }
-  };
-  console.log("orderData", orderData);
-
+export const OrderDataTable = () => {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -193,56 +161,41 @@ export const DataTable = () => {
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    onColumnVisibilityChange: setColumnVisibility,
+    // onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
     state: {
       sorting,
       columnFilters,
-      columnVisibility,
+      //   columnVisibility,
       rowSelection,
     },
   });
 
   return (
     <div className="w-full">
-      <div className="flex items-center py-4">
-        <Input
-          placeholder="Filter emails..."
-          value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("email")?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm"
-        />
-        {/* <OrderDatePicker /> */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
-              Columns <ChevronDown />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {table
-              .getAllColumns()
-              .filter((column) => column.getCanHide())
-              .map((column) => {
-                return (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
-                    }
-                  >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                );
-              })}
-          </DropdownMenuContent>
-        </DropdownMenu>
+      <div className="flex justify-between w-full m-5 h-[60px] border rounded-md p-2">
+        <div className="flex flex-col items-center">
+          <h1 className="font-bold">Orders</h1>
+          <span className="text-xs">32 items</span>
+        </div>
+        <div className="flex items-center py-4">
+          <Input
+            placeholder="Filter emails..."
+            value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
+            onChange={(event) =>
+              table.getColumn("email")?.setFilterValue(event.target.value)
+            }
+            className="w-[300px]"
+          />
+        </div>
+        <div className="flex justify-between gap-4">
+          <button className="bg-[#18181B] border rounded-full px-2 text-white opacity-20">
+            Change delivery state
+          </button>
+        </div>
       </div>
-      <div className="rounded-md border">
+
+      <div className="overflow-hidden rounded-md border">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (

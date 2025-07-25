@@ -8,7 +8,7 @@ const food = new Schema(
     price: { type: Number, required: [true, "Please enter price"] },
     image: String,
     ingredients: String,
-    category: { type: Types.ObjectId, ref: "Category", required: true },
+    category: { type: Types.ObjectId, ref: "Category" },
   },
   { timestamps: true }
 );

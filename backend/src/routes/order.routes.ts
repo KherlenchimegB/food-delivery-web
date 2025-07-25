@@ -10,10 +10,10 @@ import verifyToken from "../middleware/auth.js";
 
 const orderRouter = express.Router();
 
-orderRouter.get("/", verifyToken, getAllOrder);
+orderRouter.get("/", getAllOrder);
 orderRouter.get("/:userId", getOrderByUserId);
 orderRouter.post("/", createOrder);
-orderRouter.patch("/:foodOrderId", verifyToken, updateOrderById);
-orderRouter.delete("/:foodOrderId", verifyToken, deleteOrder);
+orderRouter.patch("/:foodOrderId", updateOrderById);
+orderRouter.delete("/:foodOrderId", deleteOrder);
 
 export default orderRouter;

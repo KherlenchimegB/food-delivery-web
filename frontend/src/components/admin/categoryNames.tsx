@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { AddCategoryButton } from "./addCategoryButton";
+import { AddCategoryButton } from "./updateFood/addCategoryButton";
 
 const baseurl = "http://localhost:8000/";
 

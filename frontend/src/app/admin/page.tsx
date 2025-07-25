@@ -1,10 +1,7 @@
 "use client";
-
-import { DataTable } from "@/components/admin/adminOrderTable";
-
+import { DataTable } from "@/components/admin/adminTable/dataTable";
 import { useState } from "react";
 import { LayoutDashboard, Truck } from "lucide-react";
-
 import {
   Sidebar,
   SidebarContent,
@@ -17,6 +14,7 @@ import {
 } from "@/components/ui/sidebar";
 import { FoodMenu } from "@/components/admin/foodMenu";
 import { CategoryNames } from "@/components/admin/categoryNames";
+import { OrderDataTable } from "@/components/admin/adminTable/orderDataTable";
 
 export default function Home() {
   const [select, setSelect] = useState(1);
@@ -25,7 +23,7 @@ export default function Home() {
     else setSelect(1);
   };
   return (
-    <div>
+    <div className="w-screen">
       <Sidebar>
         <SidebarContent>
           <SidebarGroup>
@@ -75,7 +73,7 @@ export default function Home() {
           </SidebarGroup>
         </SidebarContent>
       </Sidebar>
-      {select === 1 && <DataTable />}
+      {select === 1 && <OrderDataTable />}
       {select === 2 && <CategoryNames />}
       {select === 2 && <FoodMenu />}
     </div>
