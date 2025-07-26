@@ -2,10 +2,28 @@
 import { HomeFoodCard } from "@/components/home/homeFoodCard";
 import { useEffect, useState } from "react";
 import { AddDishesButton } from "./addDishesButton";
+import { baseUrl } from "@/lib/utils";
 
-const baseurl = "http://localhost:8000/";
+type TFoodOrderItem = {
+  _id: string;
+  user: string;
+  foodOrderItems: [TFood];
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+  __v: string;
+};
+
+type TFood = {
+  _id: string;
+  name: string;
+};
+
+type TFoodOrderTable = Pick<TFoodOrderItem, "user" | "foodOrderItems">;
 
 export const FoodMenu = () => {
+  console.log("=============food meny -------------");
+
   const [foodData, setFoodData] = useState<any[]>([]);
   const [categoryData, setCategoryData] = useState<any[]>([]);
 
@@ -16,7 +34,7 @@ export const FoodMenu = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch(`${baseurl}food-category`);
+      const response = await fetch(`${baseUrl}food-category`);
       const responseData = await response.json();
       setCategoryData(responseData.data);
     } catch (error) {
@@ -26,7 +44,7 @@ export const FoodMenu = () => {
 
   const fetchFoods = async () => {
     try {
-      const response = await fetch(`${baseurl}food`);
+      const response = await fetch(`${baseUrl}food`);
       const responseData = await response.json();
       setFoodData(responseData.data);
     } catch (error) {

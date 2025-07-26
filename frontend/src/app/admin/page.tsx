@@ -1,6 +1,5 @@
 "use client";
-import { DataTable } from "@/components/admin/adminTable/dataTable";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { LayoutDashboard, Truck } from "lucide-react";
 import {
   Sidebar,
@@ -15,13 +14,23 @@ import {
 import { FoodMenu } from "@/components/admin/foodMenu";
 import { CategoryNames } from "@/components/admin/categoryNames";
 import { OrderDataTable } from "@/components/admin/adminTable/orderDataTable";
+// import { cardContext } from "@/context/cardContext";
 
 export default function Home() {
+  // const { cart, setCart } = useContext(cardContext);
+
   const [select, setSelect] = useState(1);
   const handleSelect = () => {
     if (select === 1) setSelect(2);
     else setSelect(1);
   };
+
+  console.log(
+    "==================admin huudas render=================="
+    // cart,
+    // setCart
+  );
+
   return (
     <div className="w-screen">
       <Sidebar>

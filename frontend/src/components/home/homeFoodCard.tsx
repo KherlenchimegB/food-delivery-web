@@ -1,5 +1,5 @@
-import { CldImage } from "next-cloudinary";
 import { FoodDetails } from "./foodDetails";
+import Image from "next/image";
 import { UpdateDishButton } from "../admin/updateFood/updateFoodButton";
 
 export const HomeFoodCard = ({
@@ -11,25 +11,24 @@ export const HomeFoodCard = ({
   isHome,
   categoryName,
 }: {
-  id: String;
+  id: string;
   image: string;
-  foodName: String;
-  price: Number;
-  ingredients: String;
+  foodName: string;
+  price: number;
+  ingredients: string;
   isHome: Boolean;
   categoryName: string;
 }) => {
   return (
     <div className="w-auto p-4 bg-white border rounded-xl m-[20px] gap-5">
       <div className="w-full h-auto gap-5 border-none rounded-md relative">
-        <div className="w-full h-auto border-none rounded-md">
-          <CldImage
+        <div className="aspect-[4/3] relative overflow-hidden rounded-t-2xl">
+          <Image
             src={image}
             alt="food"
-            width="650"
-            height="240"
-            crop="fill"
-            className="border-none rounded-md"
+            fill
+            className="object-cover"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
         </div>
 

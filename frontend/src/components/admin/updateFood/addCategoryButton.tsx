@@ -14,7 +14,7 @@ import * as yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 // import axios from "axios";
-const baseurl = "http://localhost:8000/";
+import { baseUrl } from "@/lib/utils";
 
 const addCategorySchema = yup.object({
   categoryName: yup.string().required("Please must enter Category name"),
@@ -35,7 +35,7 @@ export const AddCategoryButton = () => {
   const onSubmit = async (formData: AddCategoryFormData) => {
     console.log("ajillalaa");
     try {
-      const response = await fetch(`${baseurl}food-category`, {
+      const response = await fetch(`${baseUrl}food-category`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

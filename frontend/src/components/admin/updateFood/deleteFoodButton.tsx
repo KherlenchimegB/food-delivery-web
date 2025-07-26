@@ -3,20 +3,10 @@
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Trash } from "lucide-react";
-import axios from "axios";
-const baseurl = "http://localhost:8000/";
+
+import { baseUrl } from "@/lib/utils";
 
 export const DeleteFoodButton = () => {
-  // const deleteFood = async (id: string) => {
-  //   try {
-  //     const response = await axios.delete(`${baseurl}food`, {
-  //       id: id,
-  //     });
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // };
-
   return (
     <Button
       variant="outline"

@@ -50,7 +50,7 @@ export default function Home() {
       </div>
 
       <div className="flex flex-col gap-[54px] px-10 py-16">
-        {categoryData.map((category, index) => (
+        {categoryData.map((category) => (
           <div className="flex flex-col gap-4" key={category._id}>
             <p className="font-semibold text-3xl text-[#FFFFFF] p-4">
               {category.categoryName}
@@ -58,9 +58,10 @@ export default function Home() {
             <div className="grid grid-cols-3 gap-9">
               {foodData
                 .filter(
-                  (food) => food.category.categoryName === category.categoryName
+                  (food) =>
+                    food.category?.categoryName === category?.categoryName
                 )
-                .map((food, index) => (
+                .map((food) => (
                   <HomeFoodCard
                     key={food._id}
                     id={food._id}
@@ -69,6 +70,7 @@ export default function Home() {
                     price={food.price}
                     ingredients={food.ingredients}
                     isHome={true}
+                    categoryName={food.category.categoryName}
                   />
                 ))}
             </div>

@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { AddCategoryButton } from "./updateFood/addCategoryButton";
 
-const baseurl = "http://localhost:8000/";
+import { baseUrl } from "@/lib/utils";
 
 export const CategoryNames = () => {
   const [foodData, setFoodData] = useState<any[]>([]);
@@ -15,7 +15,7 @@ export const CategoryNames = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch(`${baseurl}food-category`);
+      const response = await fetch(`${baseUrl}food-category`);
       const responseData = await response.json();
       setCategoryData(responseData.data);
     } catch (error) {
@@ -25,7 +25,7 @@ export const CategoryNames = () => {
 
   const fetchFoods = async () => {
     try {
-      const response = await fetch(`${baseurl}food`);
+      const response = await fetch(`${baseUrl}food`);
       const responseData = await response.json();
       setFoodData(responseData.data);
     } catch (error) {

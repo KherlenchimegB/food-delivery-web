@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/table";
 import { DeliveryStatusDropDownButton } from "./statusDropDownButton";
 import { DataFoodListShow } from "./dataFoodListButton";
-import { count } from "console";
+import { OrderDatePicker } from "./datepicker";
 
 const data: Payment[] = [
   {
@@ -245,6 +245,7 @@ export const OrderDataTable = () => {
             className="w-[300px]"
           />
         </div>
+        <OrderDatePicker />
         <div className="flex justify-between gap-4">
           <button className="bg-[#18181B] border rounded-full px-2 text-white opacity-20">
             Change delivery state
@@ -329,3 +330,29 @@ export const OrderDataTable = () => {
     </div>
   );
 };
+
+// {
+//             "_id": "685925155b7e2aa757b061a9",
+//             "user": null,
+//             "foodOrderItems": [
+//                 {
+//                     "food": {
+//                         "_id": "68527bc3c6e83776b3b2a525",
+//                         "foodName": "Finger food",
+//                         "price": 35000,
+//                         "image": "https://res.cloudinary.com/ddtytj1hq/image/upload/v1751622574/Food_hqfdux.png",
+//                         "ingredients": "Fluffy pancakes stacked with fruits, cream, syrup, and powdered sugar.",
+//                         "createdAt": "2025-06-18T08:41:39.890Z",
+//                         "updatedAt": "2025-06-18T08:41:39.890Z",
+//                         "__v": 0,
+//                         "category": "6853d7b26f210e91a7353a78"
+//                     },
+//                     "quantity": 4,
+//                     "_id": "685925155b7e2aa757b061aa"
+//                 },
+//             ],
+//             "status": "PENDING",
+//             "createdAt": "2025-06-23T09:57:41.209Z",
+//             "updatedAt": "2025-06-23T09:57:41.209Z",
+//             "__v": 0
+//         },

@@ -26,7 +26,7 @@ export const signIn = async (request: Request, response: Response) => {
     );
 
     const token = jwt.sign({ userId: user?._id || "" }, "pinecone-test", {
-      expiresIn: "1h",
+      expiresIn: "24h",
     });
 
     if (!comparedPassword) {
@@ -92,20 +92,16 @@ export const updateUser = async (request: Request, response: Response) => {
   }
 };
 
-export const getUser = async (request: Request, response: Response) => {
+export const getUser = async (req: Request, res: Response) => {
   try {
-    const { email } = request.body;
-    const user = await User.findOne({ email });
-
-    response.status(200).json({
-      success: true,
+    const { id } = req.params;
+    const user = await User.findOne({ _id: id });
+    res.status(200).json({
+      message: "success",
       email: user?.email,
       role: user?.role,
     });
   } catch (error) {
-    response.status(444).json({
-      success: false,
-      error: error,
-    });
+    res.status(400).json({ error });
   }
 };

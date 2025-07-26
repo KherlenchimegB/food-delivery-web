@@ -24,14 +24,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <UserContextProvider>
-      <html lang="en">
-        <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        >
+    <html lang="en">
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
+        <UserContextProvider>
+          {/* <CartContextProvider> */}
           {children}
-        </body>
-      </html>
-    </UserContextProvider>
+          {/* <Toaster /> */}
+          {/* </CartContextProvider> */}
+        </UserContextProvider>
+      </body>
+    </html>
   );
 }

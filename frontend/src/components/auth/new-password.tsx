@@ -14,7 +14,7 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 
-const baseurl = "http://localhost:8000/";
+import { baseUrl } from "@/lib/utils";
 
 const newPasSchema = yup.object({
   email: yup
@@ -52,7 +52,7 @@ export const NewPassword = () => {
   const onSubmit = async (formData: NewPassFormData) => {
     if (formData.password === formData.confirmPassword) {
       try {
-        const response = await fetch(`${baseurl}user/sign-up`, {
+        const response = await fetch(`${baseUrl}user/sign-up`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

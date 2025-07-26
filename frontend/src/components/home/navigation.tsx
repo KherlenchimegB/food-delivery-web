@@ -11,7 +11,7 @@ export const NavigationMenu = () => {
   return (
     <div className="w-full h-[68px] fixed top-0 z-50 bg-black flex justify-between pl-[88px] pr-[88px] p-[10px]">
       <div className="flex gap-2 items-center">
-        <img src="./logos/home-logo.png" alt="logo" />
+        <img src="../logos/home-logo.png" alt="logo" />
         <div className="flex-col">
           <div>
             <span className="text-white text-[20px] font-semibold ">Nom</span>

@@ -16,7 +16,8 @@ import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useRouter } from "next/navigation";
 
-const baseurl = "http://localhost:8000/";
+import { baseUrl } from "@/lib/utils";
+import axios from "axios";
 
 const signInSchema = yup.object({
   email: yup
@@ -44,20 +45,13 @@ export const SignInCard = () => {
 
   const onSubmit = async (formData: SignInFormData) => {
     try {
-      const response = await fetch(`${baseurl}user/sign-in`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-      const responseData = await response.json();
-      console.log("responseData", responseData);
-
-      if (responseData?.role === "ADMIN") router.push("/admin");
-      else router.push("/");
+      const response = await axios.post(`${baseUrl}user/sign-in`, formData);
+      localStorage.setItem("token", response.data.token);
+      router.push("/");
+      return response.data.user;
     } catch (error) {
-      console.log("error", error);
+      console.error("Error fetching data:", error);
+      throw new Error("Failed to fetch data");
     }
   };
 

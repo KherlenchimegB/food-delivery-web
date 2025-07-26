@@ -1,8 +1,10 @@
 import { AppSidebar } from "@/components/admin/sideBar";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+// import { CartContextProvider } from "@/context/cardContext";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
+    // <CartContextProvider>
     <SidebarProvider>
       <AppSidebar />
       <main>
@@ -10,5 +12,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         {children}
       </main>
     </SidebarProvider>
+    // </CartContextProvider>
   );
 }

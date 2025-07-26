@@ -20,7 +20,7 @@ import { useEffect, useState } from "react";
 import React from "react";
 import { CategoryDropDownMenu } from "./categoryDropDown";
 import { DeleteFoodButton } from "./deleteFoodButton";
-const baseurl = "http://localhost:8000/";
+import { baseUrl } from "@/lib/utils";
 
 const addDishSchema = yup.object({
   foodName: yup.string().required("Please must enter Food name"),
@@ -40,12 +40,12 @@ export const UpdateDishButton = ({
   price,
   ingredients,
 }: {
-  id: String;
+  id: string;
   image: string;
   categoryName: string;
-  foodName: String;
-  price: Number;
-  ingredients: String;
+  foodName: string;
+  price: number;
+  ingredients: string;
 }) => {
   const {
     register,
@@ -59,11 +59,11 @@ export const UpdateDishButton = ({
 
   useEffect(() => {
     fetchFoods();
-  }, []);
+  }, [foodData]);
 
   const fetchFoods = async () => {
     try {
-      const response = await fetch(`${baseurl}food`);
+      const response = await fetch(`${baseUrl}food`);
       const responseData = await response.json();
       setFoodData(responseData.data);
     } catch (error) {
@@ -74,7 +74,7 @@ export const UpdateDishButton = ({
   const onSubmit = async (formData: AddDishFormData) => {
     console.log("ajillalaa");
     try {
-      const response = await fetch(`${baseurl}food`, {
+      const response = await fetch(`${baseUrl}food/${id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -91,28 +91,28 @@ export const UpdateDishButton = ({
   };
   return (
     <Dialog>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <DialogTrigger asChild>
-          <Button
-            variant="outline"
-            className="w-11 h-11 rounded-full text-2xl text-white"
-          >
-            <PencilLine color="#ff0000" />
-          </Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px]">
+      <DialogTrigger asChild>
+        <Button
+          variant="outline"
+          className="w-11 h-11 rounded-full text-2xl text-white"
+        >
+          <PencilLine color="#ff0000" />
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[425px]">
+        <form onSubmit={handleSubmit(onSubmit)}>
           <DialogHeader>
             <DialogTitle className="text-2xl">Dishes info</DialogTitle>
             <DialogDescription></DialogDescription>
           </DialogHeader>
           <div className="flex flex-col gap-4">
             <div className="flex justify-between">
-              <span className="text-xs text-[#7171A]">Dish name</span>
+              <span className="text-xs text-[#7171AA]">Dish name</span>
               <Input
                 {...register("foodName")}
                 id="foodName"
                 name="foodName"
-                placeholder={`${foodName}`}
+                defaultValue={foodName}
                 className={`${
                   errors.foodName ? " w-2/3 border border-red-400" : " w-2/3"
                 }`}
@@ -121,21 +121,21 @@ export const UpdateDishButton = ({
             <CategoryDropDownMenu id={id} categoryName={categoryName} />
 
             <div className="flex gap-3 justify-between">
-              <span className="text-xs text-[#7171A]">Ingredients</span>
+              <span className="text-xs text-[#7171AA]">Ingredients</span>
               <Textarea
                 className="w-2/3"
-                placeholder={`${ingredients}`}
+                defaultValue={ingredients}
                 {...register("ingredients")}
               />
             </div>
 
             <div className="flex gap-3 justify-between">
-              <span className="text-xs text-[#7171A]">Price</span>
+              <span className="text-xs text-[#7171AA]">Price</span>
               <Input
                 {...register("price")}
                 id="price"
                 name="price"
-                placeholder={`${price}`}
+                defaultValue={price}
                 className={`${
                   errors.price ? " w-4/5 border border-red-400" : " w-2/3"
                 }`}
@@ -143,9 +143,9 @@ export const UpdateDishButton = ({
             </div>
 
             <div className="flex w-full gap-3 justify-between">
-              <span className="text-xs text-[#7171A]">Image</span>
+              <span className="text-xs text-[#7171AA]">Image</span>
               <img
-                src={`${image}`}
+                src={image}
                 alt="food image"
                 className="w-full h-45 border rounded-md"
               />
@@ -157,8 +157,8 @@ export const UpdateDishButton = ({
               <Button type="submit">Save changes</Button>
             </div>
           </DialogFooter>
-        </DialogContent>
-      </form>
+        </form>
+      </DialogContent>
     </Dialog>
   );
 };

@@ -16,7 +16,7 @@ import {
 import { Check, ChevronsUpDown, PencilLine } from "lucide-react";
 import { useEffect, useState } from "react";
 import React from "react";
-const baseurl = "http://localhost:8000/";
+import { baseUrl } from "@/lib/utils";
 
 export const CategoryDropDownMenu = ({
   id,
@@ -36,7 +36,7 @@ export const CategoryDropDownMenu = ({
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch(`${baseurl}food-category`);
+      const response = await fetch(`${baseUrl}food-category`);
       const responseData = await response.json();
       setCategoryData(responseData.data);
     } catch (error) {
@@ -46,7 +46,7 @@ export const CategoryDropDownMenu = ({
 
   return (
     <div className="flex justify-between">
-      <span className="text-xs text-[#7171A]">Dish category</span>
+      <span className="text-xs text-[#7171AA]">Dish category</span>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
