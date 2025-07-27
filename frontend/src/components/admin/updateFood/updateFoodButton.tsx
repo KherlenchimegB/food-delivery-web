@@ -27,7 +27,7 @@ const addDishSchema = yup.object({
   price: yup.number().required("Please must enter Food price"),
   ingredients: yup.string().required("Please must enter ingredients"),
   categoryName: yup.string().required("Please must enter Food name"),
-  //   image: yup.string() || undefined,
+  // image: yup.string() || undefined,
 });
 
 type AddDishFormData = yup.InferType<typeof addDishSchema>;
@@ -72,7 +72,7 @@ export const UpdateDishButton = ({
   };
 
   const onSubmit = async (formData: AddDishFormData) => {
-    console.log("ajillalaa");
+    console.log("ajillalaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
     try {
       const response = await fetch(`${baseUrl}food/${id}`, {
         method: "PATCH",
@@ -83,7 +83,7 @@ export const UpdateDishButton = ({
       });
       const responseData = await response.json();
       console.log("responseData", responseData);
-      console.log("ajillalaa");
+      console.log("update food button ajillalaa");
       console.log("formdata", formData);
     } catch (error) {
       console.log("error", error);

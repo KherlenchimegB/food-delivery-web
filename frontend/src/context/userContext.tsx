@@ -33,7 +33,7 @@ export const UserContextProvider = ({
         headers: { Authorization: `Bearer ${userToken}` },
       });
       setUserInfo(response.data);
-      console.log("userdata", userInfo);
+      console.log("userInfo response.data", response.data);
     } catch (error) {
       console.error(error);
     }

@@ -12,7 +12,7 @@ import { authentication } from "../middleware/auth.user.js";
 const userRouter = express.Router();
 
 userRouter.get("/refresh", refresh);
-userRouter.get("/currentUser", authentication, getUser);
+userRouter.get("/currentUser", getUser);
 userRouter.post("/sign-in", signIn);
 userRouter.post("/sign-up", signUp);
 userRouter.post("/:userId", verifyToken, updateUser);

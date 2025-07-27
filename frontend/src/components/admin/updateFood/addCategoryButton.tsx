@@ -52,16 +52,16 @@ export const AddCategoryButton = () => {
   };
   return (
     <Dialog>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <DialogTrigger asChild>
-          <Button
-            variant="outline"
-            className="w-11 h-11 rounded-full bg-red-500 text-2xl text-white"
-          >
-            +
-          </Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px]">
+      <DialogTrigger asChild>
+        <Button
+          variant="outline"
+          className="w-11 h-11 rounded-full bg-red-500 text-2xl text-white"
+        >
+          +
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[425px]">
+        <form onSubmit={handleSubmit(onSubmit)}>
           <DialogHeader>
             <DialogTitle>Add new category</DialogTitle>
             <DialogDescription></DialogDescription>
@@ -81,8 +81,8 @@ export const AddCategoryButton = () => {
           <DialogFooter>
             <Button type="submit">Add Category</Button>
           </DialogFooter>
-        </DialogContent>
-      </form>
+        </form>
+      </DialogContent>
     </Dialog>
   );
 };

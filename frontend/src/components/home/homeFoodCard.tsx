@@ -20,7 +20,7 @@ export const HomeFoodCard = ({
   categoryName: string;
 }) => {
   return (
-    <div className="w-auto p-4 bg-white border rounded-xl m-[20px] gap-5">
+    <div className="w-auto p-4 bg-white shadow-lg border rounded-xl m-[20px] gap-5">
       <div className="w-full h-auto gap-5 border-none rounded-md relative">
         <div className="aspect-[4/3] relative overflow-hidden rounded-t-2xl">
           <Image

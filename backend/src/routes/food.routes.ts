@@ -12,8 +12,8 @@ const foodsRouter = express.Router();
 
 foodsRouter.get("/", getAllFoods);
 foodsRouter.post("/", createFood);
-foodsRouter.patch("/:foodId", verifyToken, updateFood);
-foodsRouter.delete("/:foodId", verifyToken, deleteFood);
+foodsRouter.patch("/:foodId", updateFood);
+foodsRouter.delete("/:foodId", deleteFood);
 foodsRouter.get("/:foodId", getFoodByid);
 
 export default foodsRouter;

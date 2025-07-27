@@ -15,7 +15,7 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 
-const baseurl = "http://localhost:8000/";
+import { baseUrl } from "@/lib/utils";
 
 const signUpSchema = yup.object({
   email: yup
@@ -48,7 +48,7 @@ export default function SignUpPage() {
 
   const onSubmit = async (formData: SignUpFormData) => {
     try {
-      const response = await fetch(`${baseurl}user/sign-up`, {
+      const response = await fetch(`${baseUrl}user/sign-up`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -56,6 +56,7 @@ export default function SignUpPage() {
         body: JSON.stringify(formData),
       });
       const responseData = await response.json();
+
       router.push("/");
     } catch (error) {
       console.log("error", error);
