@@ -29,7 +29,9 @@ import {
 } from "@/components/home/cardNotification";
 import { CldImage } from "next-cloudinary";
 import { Separator } from "@radix-ui/react-dropdown-menu";
-
+import { CartContext } from "@/context/cardContext";
+import { Dispatch, SetStateAction } from "react";
+import { useContext } from "react";
 export const AddToCart = ({
   id,
   foodName,
@@ -37,13 +39,17 @@ export const AddToCart = ({
   price,
   ingredients,
   userId,
+  openCart,
+  setOpenCart,
 }: {
-  id: String;
+  id: string;
   image: string;
-  foodName: String;
-  price: Number;
-  ingredients: String;
-  userId: String;
+  foodName: string;
+  price: number;
+  ingredients: string;
+  userId: string;
+  openCart: boolean;
+  setOpenCart: Dispatch<SetStateAction<boolean>>;
 }) => {
   const [foodCount, setFoodCount] = useState(1);
 
@@ -57,9 +63,9 @@ export const AddToCart = ({
     setFoodCount(0);
     console.log("delete daragdlaa");
   };
-
+  const { cartItem } = useContext(CartContext);
   return (
-    <Drawer direction="top">
+    <Drawer direction="top" open={openCart} onOpenChange={setOpenCart}>
       <DrawerTrigger asChild>
         <Button variant="outline" className="w-fit border rounded-full">
           <ShoppingCart color="#ff0000" strokeWidth={1.25} />

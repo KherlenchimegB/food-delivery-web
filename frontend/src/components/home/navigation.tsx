@@ -59,7 +59,7 @@ export const NavigationMenu = () => {
           </div>
         )}
         {userInfo.email !== "" && (
-          <div>
+          <div className="flex gap-3">
             <AddressBar />
 
             <AddToCart

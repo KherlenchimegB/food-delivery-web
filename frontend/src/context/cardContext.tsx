@@ -1,20 +1,41 @@
-// import { createContext, useState } from "react";
+"use client";
 
-// type contextType = {};
+import { createContext, useState } from "react";
 
-// const defaultContextValue = {
-//   cart: "",
-//   setCart: () => void
-// };
+type CartItem = {
+  foodName: string;
+  price: number;
+  image: string;
+};
 
-// export const cardContext = createContext(defaultContextValue);
+type CartContextProps = {
+  cartItem: CartItem[];
+  addToCart: (cartItem: CartItem) => void;
+  removeCartItem: (cartItemId: string) => void;
+};
 
-// export const CartContextProvider = ({ children }) => {
-//   const [cart, setCart] = useState({ product: "" });
+export const CartContext = createContext<CartContextProps>({
+  cartItem: [],
+  addToCart: () => {},
+  removeCartItem: () => {},
+});
 
-//   return (
-//     <cardContext.Provider value={{ cart, setCart }}>
-//       {children}
-//     </cardContext.Provider>
-//   );
-// };
+export const CartContextProvider = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
+  const [cartItem, setCartItem] = useState<CartItem[]>([]);
+
+  const addToCart = (foodItem: CartItem) => {
+    setCartItem([...cartItem, foodItem]);
+  };
+
+  const removeCartItem = (foodId: string) => {};
+
+  return (
+    <CartContext.Provider value={{ cartItem, addToCart, removeCartItem }}>
+      {children}
+    </CartContext.Provider>
+  );
+};
