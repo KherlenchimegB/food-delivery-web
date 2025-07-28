@@ -2,7 +2,7 @@
 import { ChevronRight, LogOut, MapPin, User } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { AddToCart } from "./addToCard";
-import { useContext, useState } from "react";
+import { SetStateAction, useContext, useState } from "react";
 import { UserContext } from "@/context/userContext";
 import { Button } from "../ui/button";
 import {
@@ -13,12 +13,10 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import { id } from "date-fns/locale";
 
 export const NavigationMenu = () => {
   const router = useRouter();
   // const handleAddToCart = () => {
-
   // };
   const { userInfo } = useContext(UserContext);
   const [openCart, setOpenCart] = useState(false);
@@ -73,6 +71,10 @@ export const NavigationMenu = () => {
                 "Fluffy pancakes stacked with fruits, cream, syrup, and powdered sugar."
               }
               userId={"userInfo"}
+              openCart={false}
+              setOpenCart={function (value: SetStateAction<boolean>): void {
+                throw new Error("Function not implemented.");
+              }}
             />
 
             <DropdownMenu>
