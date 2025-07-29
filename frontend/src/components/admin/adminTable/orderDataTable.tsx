@@ -12,7 +12,7 @@ import {
   SortingState,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowUpDown } from "lucide-react";
+import { ArrowUpDown, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -27,67 +27,13 @@ import {
 import { DeliveryStatusDropDownButton } from "./statusDropDownButton";
 import { DataFoodListShow } from "./dataFoodListButton";
 import { OrderDatePicker } from "./datepicker";
+import { useOrders } from "@/hooks/useOrders";
+import { Order } from "@/types/order";
 
-const data: Payment[] = [
-  {
-    id: "685925155b7e2aa757b061a9",
-    email: "bold10@gmail.com",
-    food: [
-      {
-        id: "68527cbff6e759b7ded59fac",
-        foodName: "Brie Crostini Appetizer",
-        count: 2,
-        price: 35000,
-        image:
-          "https://res.cloudinary.com/ddtytj1hq/image/upload/v1751622625/food4_lngefv.png",
-      },
-    ],
+// Remove the hardcoded data - we'll use data from the backend
+export type Payment = Order; // Using the Order type from our types file
 
-    date: "2025-06-26",
-    amount: 70000, //total
-    address: "BGD 24-8-101",
-    status: "PENDING",
-  },
-  {
-    id: "685925155b7e2aa757b061a9",
-    email: "bataa@gmail.com",
-    food: [
-      {
-        id: "68527cbff6e759b7ded59fac",
-        foodName: "Brie Crostini Appetizer",
-        count: 2,
-        price: 25000,
-        image:
-          "https://res.cloudinary.com/ddtytj1hq/image/upload/v1751622625/food4_lngefv.png",
-      },
-    ],
-
-    date: "2025-05-26",
-    amount: 50000,
-    address: "BGD 24-8-101",
-    status: "DELIVERED",
-  },
-];
-
-export type Payment = {
-  id: string;
-  email: string;
-  food: [
-    {
-      id: string;
-      foodName: string;
-      count: number;
-      price: number;
-      image: string;
-    }
-  ];
-  date: string;
-  amount: number; //total
-  address: string;
-  status: "PENDING" | "CANCELED" | "DELIVERED";
-};
-
-export const columns: ColumnDef<Payment>[] = [
+const createColumns = (updateOrderStatus: (orderId: string, status: string) => Promise<void>): ColumnDef<Payment>[] => [
   {
     id: "select",
     header: ({ table }) => (
@@ -128,22 +74,30 @@ export const columns: ColumnDef<Payment>[] = [
   {
     accessorKey: "food",
     header: () => <div className="text-left">Foods</div>,
-    cell: ({ row }) => (
-      <div className="flex justify-start capitalize w-40 gap-5  ">
-        {/* backendees data oruulah */}
-        <DataFoodListShow
-          image={
-            "https://res.cloudinary.com/ddtytj1hq/image/upload/v1751622625/food4_lngefv.png"
-          }
-          foodName={"Brie Crostini Appetizer"}
-          count={2}
-        />
-        <div>
-          {/* {row.getValue("food")}  */}
-          foods
+    cell: ({ row }) => {
+      const foods = row.getValue("food") as Payment["food"];
+      const firstFood = foods[0];
+      
+      return (
+        <div className="flex justify-start capitalize w-40 gap-5">
+          {firstFood && (
+            <DataFoodListShow
+              image={firstFood.image || "https://res.cloudinary.com/ddtytj1hq/image/upload/v1751622625/food4_lngefv.png"}
+              foodName={firstFood.foodName}
+              count={firstFood.count}
+            />
+          )}
+          <div className="flex flex-col">
+            <span className="text-sm font-medium">{firstFood?.foodName}</span>
+            {foods.length > 1 && (
+              <span className="text-xs text-gray-500">
+                +{foods.length - 1} more items
+              </span>
+            )}
+          </div>
         </div>
-      </div>
-    ),
+      );
+    },
   },
   {
     accessorKey: "date",
@@ -192,12 +146,19 @@ export const columns: ColumnDef<Payment>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => (
-      <div className="flex justify-between capitalize w-40 gap-5 border px-2 rounded-full">
-        {row.getValue("status")}
-        <DeliveryStatusDropDownButton />
-      </div>
-    ),
+    cell: ({ row }) => {
+      const order = row.original;
+      return (
+        <div className="flex justify-between capitalize w-40 gap-5 border px-2 rounded-full">
+          {row.getValue("status")}
+                     <DeliveryStatusDropDownButton 
+             orderId={order.id}
+             currentStatus={order.status}
+             onStatusChange={updateOrderStatus}
+           />
+        </div>
+      );
+    },
   },
 ];
 
@@ -206,11 +167,16 @@ export const OrderDataTable = () => {
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );
-
   const [rowSelection, setRowSelection] = React.useState({});
 
+  // Use the custom hook to fetch orders
+  const { orders, loading, error, refetch, updateOrderStatus } = useOrders();
+
+  // Create columns with the updateOrderStatus function
+  const columns = React.useMemo(() => createColumns(updateOrderStatus), [updateOrderStatus]);
+
   const table = useReactTable({
-    data,
+    data: orders, // Use real data from backend
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -225,6 +191,32 @@ export const OrderDataTable = () => {
       rowSelection,
     },
   });
+
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="w-full flex items-center justify-center h-64">
+        <div className="flex items-center gap-2">
+          <Loader2 className="h-6 w-6 animate-spin" />
+          <span>Loading orders...</span>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <div className="w-full flex items-center justify-center h-64">
+        <div className="text-center">
+          <p className="text-red-500 mb-4">Error: {error}</p>
+          <Button onClick={refetch} variant="outline">
+            Try Again
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full">
@@ -330,29 +322,3 @@ export const OrderDataTable = () => {
     </div>
   );
 };
-
-// {
-//             "_id": "685925155b7e2aa757b061a9",
-//             "user": null,
-//             "foodOrderItems": [
-//                 {
-//                     "food": {
-//                         "_id": "68527bc3c6e83776b3b2a525",
-//                         "foodName": "Finger food",
-//                         "price": 35000,
-//                         "image": "https://res.cloudinary.com/ddtytj1hq/image/upload/v1751622574/Food_hqfdux.png",
-//                         "ingredients": "Fluffy pancakes stacked with fruits, cream, syrup, and powdered sugar.",
-//                         "createdAt": "2025-06-18T08:41:39.890Z",
-//                         "updatedAt": "2025-06-18T08:41:39.890Z",
-//                         "__v": 0,
-//                         "category": "6853d7b26f210e91a7353a78"
-//                     },
-//                     "quantity": 4,
-//                     "_id": "685925155b7e2aa757b061aa"
-//                 },
-//             ],
-//             "status": "PENDING",
-//             "createdAt": "2025-06-23T09:57:41.209Z",
-//             "updatedAt": "2025-06-23T09:57:41.209Z",
-//             "__v": 0
-//         },
