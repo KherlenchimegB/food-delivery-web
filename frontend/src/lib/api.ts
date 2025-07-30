@@ -1,72 +1,123 @@
+import axios from 'axios';
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
-export const api = {
-  async get(endpoint: string) {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-    
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    
-    return response.json();
+// Create axios instance
+const api = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
   },
+});
 
-  async patch(endpoint: string, data: any) {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
-    
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+// Request interceptor to add auth token
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
-    
-    return response.json();
+    return config;
   },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
-  async post(endpoint: string, data: any) {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
-    
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+// Response interceptor to handle auth errors
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      window.location.href = '/login';
     }
-    
-    return response.json();
+    return Promise.reject(error);
+  }
+);
+
+// Auth API
+export const authApi = {
+  signup: async (email: string, password: string) => {
+    const response = await api.post('/auth/signup', { email, password });
+    return response.data;
   },
-
-  async delete(endpoint: string) {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-    
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    
-    return response.json();
+  
+  login: async (email: string, password: string) => {
+    const response = await api.post('/auth/login', { email, password });
+    return response.data;
   },
 };
 
-// Orders API functions
-export const ordersApi = {
-  getAllOrders: () => api.get('/food-order'),
-  updateOrderStatus: (orderId: string, status: string) => 
-    api.patch(`/food-order/${orderId}`, { status }),
+// Projects API
+export const projectsApi = {
+  getAll: async () => {
+    const response = await api.get('/projects');
+    return response.data;
+  },
+  
+  getById: async (id: number) => {
+    const response = await api.get(`/projects/${id}`);
+    return response.data;
+  },
+  
+  create: async (name: string) => {
+    const response = await api.post('/projects', { name });
+    return response.data;
+  },
+  
+  update: async (id: number, name: string) => {
+    const response = await api.put(`/projects/${id}`, { name });
+    return response.data;
+  },
+  
+  delete: async (id: number) => {
+    const response = await api.delete(`/projects/${id}`);
+    return response.data;
+  },
 };
+
+// Tasks API
+export const tasksApi = {
+  getAll: async (projectId?: number, filter?: 'all' | 'active' | 'completed') => {
+    const params = new URLSearchParams();
+    if (projectId) params.append('projectId', projectId.toString());
+    if (filter && filter !== 'all') params.append('filter', filter);
+    
+    const response = await api.get(`/tasks?${params.toString()}`);
+    return response.data;
+  },
+  
+  getById: async (id: number) => {
+    const response = await api.get(`/tasks/${id}`);
+    return response.data;
+  },
+  
+  create: async (title: string, projectId: number) => {
+    const response = await api.post('/tasks', { title, projectId });
+    return response.data;
+  },
+  
+  update: async (id: number, data: { title?: string; completed?: boolean }) => {
+    const response = await api.put(`/tasks/${id}`, data);
+    return response.data;
+  },
+  
+  toggle: async (id: number) => {
+    const response = await api.patch(`/tasks/${id}/toggle`);
+    return response.data;
+  },
+  
+  delete: async (id: number) => {
+    const response = await api.delete(`/tasks/${id}`);
+    return response.data;
+  },
+  
+  getStats: async () => {
+    const response = await api.get('/tasks/stats/dashboard');
+    return response.data;
+  },
+};
+
+export default api;

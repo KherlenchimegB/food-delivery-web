@@ -1,28 +1,28 @@
-import express, { response } from "express";
+import express from "express";
 import dotenv from "dotenv";
-import mongoose from "mongoose";
-import foodsRouter from "./routes/food.routes.js";
-import categoryRouter from "./routes/category.routes.js";
-import orderRouter from "./routes/order.routes.js";
-import userRouter from "./routes/user.routes.js";
-import verifyToken from "./middleware/auth.js";
 import cors from "cors";
+import authRoutes from "./routes/auth.routes.js";
+import projectRoutes from "./routes/project.routes.js";
+import taskRoutes from "./routes/task.routes.js";
 
 dotenv.config();
-
-mongoose.connect(process.env.MONGO_URI || "");
 
 const server = express();
 server.use(express.json());
 server.use(cors());
 
-const port = process.env.PORT;
+const port = process.env.PORT || 8000;
 
-server.use("/food", foodsRouter);
-server.use("/user", userRouter);
-server.use("/food-category", categoryRouter);
-server.use("/food-order", orderRouter);
+// Routes
+server.use("/auth", authRoutes);
+server.use("/projects", projectRoutes);
+server.use("/tasks", taskRoutes);
+
+// Health check endpoint
+server.get("/health", (req, res) => {
+  res.json({ status: "OK", message: "Task Manager API is running" });
+});
 
 server.listen(port, () => {
-  console.log("Server aslaa");
+  console.log(`Server running on port ${port}`);
 });

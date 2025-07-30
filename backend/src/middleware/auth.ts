@@ -1,22 +1,28 @@
-import jwt from "jsonwebtoken";
-import { User } from "../models/user.models.js";
+import jwt from 'jsonwebtoken';
+import { Request, Response, NextFunction } from 'express';
 
-const verifyToken = async (request: any, response: any, next: any) => {
-  const token = request.header("Authorization");
+interface AuthRequest extends Request {
+  userId?: number;
+  userEmail?: string;
+}
 
-  const user = await User.findOne(request.userId);
+const authenticateToken = (req: AuthRequest, res: Response, next: NextFunction) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
 
-  console.log("user", user);
-
-  if (!token) return response.status(401).json({ error: "Access denied" });
-
-  try {
-    const decoded: any = jwt.verify(token, "pinecone-test");
-    request.userId = decoded.userId;
-    next();
-  } catch (error) {
-    response.status(401).json({ error: error });
+  if (!token) {
+    return res.status(401).json({ error: 'Access token required' });
   }
+
+  jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret', (err, decoded: any) => {
+    if (err) {
+      return res.status(403).json({ error: 'Invalid or expired token' });
+    }
+
+    req.userId = decoded.userId;
+    req.userEmail = decoded.email;
+    next();
+  });
 };
 
-export default verifyToken;
+export default authenticateToken;
