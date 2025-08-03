@@ -21,9 +21,11 @@ import { baseUrl } from "@/lib/utils";
 export const CategoryDropDownMenu = ({
   id,
   categoryName,
+  onCategoryChange,
 }: {
   id: String;
   categoryName: string;
+  onCategoryChange?: (categoryName: string) => void;
 }) => {
   const [categoryData, setCategoryData] = useState<any[]>([]);
   const [open, setOpen] = React.useState(false);
@@ -73,8 +75,14 @@ export const CategoryDropDownMenu = ({
                     key={category._id}
                     value={category.categoryName}
                     onSelect={(currentValue) => {
-                      setValue(currentValue === value ? "" : currentValue);
+                      const newValue =
+                        currentValue === value ? "" : currentValue;
+                      setValue(newValue);
                       setOpen(false);
+                      // Category сонгогдсон үед parent component-д мэдэгдэх
+                      if (onCategoryChange) {
+                        onCategoryChange(newValue);
+                      }
                     }}
                   >
                     {category.categoryName}

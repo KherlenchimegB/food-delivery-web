@@ -7,6 +7,7 @@ import { baseUrl } from "@/lib/utils";
 
 type User = {
   email: string;
+  role?: string;
 };
 
 type UserContextProps = {
@@ -28,6 +29,14 @@ export const UserContextProvider = ({
 
   const getCurrentUser = async () => {
     const userToken = localStorage.getItem("token");
+    const userEmail = localStorage.getItem("email");
+
+    // Token байхгүй бол user info-г хоосон болгох
+    if (!userToken) {
+      setUserInfo({ email: "" });
+      return;
+    }
+
     try {
       const response = await axios.get(`${baseUrl}user/currentUser`, {
         headers: { Authorization: `Bearer ${userToken}` },
@@ -36,6 +45,11 @@ export const UserContextProvider = ({
       console.log("userInfo response.data", response.data);
     } catch (error) {
       console.error(error);
+      // API error үед ч user info-г хоосон болгох
+      setUserInfo({ email: "" });
+      // Token-г хасах
+      localStorage.removeItem("token");
+      localStorage.removeItem("email");
     }
   };
 

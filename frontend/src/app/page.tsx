@@ -34,8 +34,13 @@ export default function Home() {
     }
   };
 
+  // Category-гүй хоолнуудыг олох
+  const foodsWithoutCategory = foodData.filter(
+    (food) => !food.category || !food.category.categoryName
+  );
+
   return (
-    <div className="flex w-screen flex-col bg-[#404040]">
+    <div className="flex w-screen flex-col bg-[#404040] min-h-screen">
       <NavigationMenu />
 
       <div className="w-full">
@@ -44,6 +49,7 @@ export default function Home() {
           alt="home picture"
           width="2400"
           height="940"
+          className="w-full h-auto"
         />
       </div>
 
@@ -51,18 +57,43 @@ export default function Home() {
         {categoryData.length === 0 ? (
           <div className="text-white px-10">Loading categories...</div>
         ) : (
-          categoryData.map((category) => (
-            <div className="flex flex-col gap-4" key={category._id}>
-              <p className="font-semibold text-3xl text-[#FFFFFF] p-4">
-                {category.categoryName}
-              </p>
-              <div className="grid grid-cols-3 gap-9">
-                {foodData
-                  .filter(
-                    (food) =>
-                      food.category?.categoryName === category?.categoryName
-                  )
-                  .map((food) => (
+          <>
+            {/* Category-тай хоолнууд */}
+            {categoryData.map((category) => (
+              <div className="flex flex-col gap-4" key={category._id}>
+                <p className="font-semibold text-3xl text-[#FFFFFF] p-4">
+                  {category.categoryName}
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {foodData
+                    .filter(
+                      (food) =>
+                        food.category?.categoryName === category?.categoryName
+                    )
+                    .map((food) => (
+                      <HomeFoodCard
+                        key={food._id}
+                        id={food._id}
+                        image={food.image}
+                        foodName={food.foodName}
+                        price={food.price}
+                        ingredients={food.ingredients}
+                        isHome={true}
+                        categoryName={food.category.categoryName}
+                      />
+                    ))}
+                </div>
+              </div>
+            ))}
+
+            {/* Category-гүй хоолнууд */}
+            {foodsWithoutCategory.length > 0 && (
+              <div className="flex flex-col gap-4">
+                <p className="font-semibold text-3xl text-[#FFFFFF] p-4">
+                  Other Foods
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {foodsWithoutCategory.map((food) => (
                     <HomeFoodCard
                       key={food._id}
                       id={food._id}
@@ -71,12 +102,13 @@ export default function Home() {
                       price={food.price}
                       ingredients={food.ingredients}
                       isHome={true}
-                      categoryName={food.category.categoryName}
+                      categoryName="Other Foods"
                     />
                   ))}
+                </div>
               </div>
-            </div>
-          ))
+            )}
+          </>
         )}
       </div>
       <Footer />

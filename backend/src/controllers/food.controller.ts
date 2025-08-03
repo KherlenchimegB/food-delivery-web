@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { Food } from "../models/index.js";
+import { Food, Category } from "../models/index.js";
 
 export const getAllFoods = async (request: Request, response: Response) => {
   try {
@@ -28,17 +28,32 @@ export const getFoodByid = async (request: Request, response: Response) => {
 
 export const createFood = async (request: Request, response: Response) => {
   try {
-    const { foodName, price, image, ingredients, category } = request.body;
+    const { foodName, price, image, ingredients, categoryName } = request.body;
+
+    // CategoryName-ээс category ID олох
+    let categoryId = null;
+    if (categoryName && categoryName !== "Other Foods") {
+      const category = await Category.findOne({ categoryName: categoryName });
+      if (category) {
+        categoryId = category._id;
+      }
+    }
+
     const createdFood = await Food.create({
       foodName: foodName,
       price: price,
       image: image,
       ingredients: ingredients,
-      category: category,
+      category: categoryId,
       createdAt: new Date(),
       updatedAt: new Date(),
     });
-    response.json({ success: true, data: createdFood });
+
+    // Populate category-тай хамт буцаах
+    const populatedFood = await Food.findById(createdFood._id).populate(
+      "category"
+    );
+    response.json({ success: true, data: populatedFood });
   } catch (error) {
     response.status(444).json({
       success: false,
@@ -49,11 +64,30 @@ export const createFood = async (request: Request, response: Response) => {
 
 export const updateFood = async (request: Request, response: Response) => {
   try {
-    const updatedFood = request.body;
+    const { foodName, price, image, ingredients, categoryName } = request.body;
     const { foodId } = request.params;
-    const food = await Food.findByIdAndUpdate(foodId, updatedFood, {
+
+    // CategoryName-ээс category ID олох
+    let categoryId = null;
+    if (categoryName && categoryName !== "Other Foods") {
+      const category = await Category.findOne({ categoryName: categoryName });
+      if (category) {
+        categoryId = category._id;
+      }
+    }
+
+    const updatedFoodData = {
+      foodName,
+      price,
+      image,
+      ingredients,
+      category: categoryId,
+      updatedAt: new Date(),
+    };
+
+    const food = await Food.findByIdAndUpdate(foodId, updatedFoodData, {
       new: true,
-    });
+    }).populate("category");
 
     response.json({ success: true, data: food });
   } catch (error) {

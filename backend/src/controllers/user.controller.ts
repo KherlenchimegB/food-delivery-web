@@ -39,6 +39,10 @@ export const signIn = async (request: Request, response: Response) => {
         success: true,
         message: "Authenticated",
         token: token,
+        user: {
+          email: user?.email,
+          role: user?.role || "USER",
+        },
       });
     }
   } catch (error) {

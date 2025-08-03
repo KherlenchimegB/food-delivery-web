@@ -52,14 +52,15 @@ export const CategoryNames = () => {
   return (
     <div className="flex flex-col w-full p-4 bg-white">
       <h1 className="text-3xl">Dishes category</h1>
-      <div className="flex gap-2">
+      <div className="flex gap-2 w-full flex-wrap">
         {categoryData.map((category) => (
-          <div key={category._id}>
-            <div className="flex border rounded-full text-xl p-2 gap-2 w-fit">
-              <span>{category?.categoryName}</span>
-              <div className="flex bg-black border rounded-full w-[30px] h-[30px] text-white items-center justify-center">
-                {count(category)}
-              </div>
+          <div
+            key={category._id}
+            className="flex border rounded-full text-xl p-2 gap-2 whitespace-nowrap"
+          >
+            <span className="text-black">{category?.categoryName}</span>
+            <div className="flex bg-black border rounded-full w-[30px] h-[30px] text-white items-center justify-center">
+              {count(category)}
             </div>
           </div>
         ))}

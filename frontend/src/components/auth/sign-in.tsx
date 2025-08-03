@@ -15,6 +15,8 @@ import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useRouter } from "next/navigation";
+import { useState, useContext } from "react";
+import { UserContext } from "@/context/userContext";
 
 import { baseUrl } from "@/lib/utils";
 import axios from "axios";
@@ -22,32 +24,60 @@ import axios from "axios";
 const signInSchema = yup.object({
   email: yup
     .string()
-    .email("Please enter a valid email address")
+    .email("Invalid email. Use a format like example@email.com")
     .required("Please must enter your email"),
   password: yup
     .string()
-    .min(6, "Please enter 6 characters long password")
+    .min(6, "Incorrect password. Please try again")
     .required("Please must enter your password"),
 });
 
-type SignInFormData = yup.InferType<typeof signInSchema>; // typescript utility type
+type SignInFormData = yup.InferType<typeof signInSchema>;
 
 export const SignInCard = () => {
   const router = useRouter();
+  const { setUserInfo } = useContext(UserContext);
+  const [isFormValid, setIsFormValid] = useState(false);
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    watch,
+    formState: { errors, isValid },
   } = useForm<SignInFormData>({
-    resolver: yupResolver(signInSchema), // connect with yup validation
+    resolver: yupResolver(signInSchema),
     mode: "onChange",
   });
+
+  // Form-ийн утгуудыг хянах
+  const watchedFields = watch();
+  const hasValidData = watchedFields.email && watchedFields.password;
 
   const onSubmit = async (formData: SignInFormData) => {
     try {
       const response = await axios.post(`${baseUrl}user/sign-in`, formData);
       localStorage.setItem("token", response.data.token);
-      router.push("/");
+      localStorage.setItem("email", formData.email);
+
+      console.log("=== SIGN-IN DEBUG ===");
+      console.log("Response data:", response.data);
+      console.log("User role:", response.data.user?.role);
+      console.log("Is admin:", response.data.user?.role === "ADMIN");
+
+      // UserInfo-г шинэчлэх (role мэдээлэлтэй)
+      setUserInfo({
+        email: formData.email,
+        role: response.data.user?.role || "USER",
+      });
+
+      // Role шалгаж, admin бол admin page рүү үсэрдэх
+      if (response.data.user?.role === "ADMIN") {
+        console.log("Redirecting to admin page");
+        router.push("/admin");
+      } else {
+        console.log("Redirecting to home page");
+        router.push("/");
+      }
+
       return response.data.user;
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -57,58 +87,91 @@ export const SignInCard = () => {
 
   return (
     <div className="flex items-center justify-center w-2/5 h-full">
-      <Card className="w-full max-w-sm ">
-        <CardHeader>
-          <div className="flex items-center border border-[#E4E4E7] rounded-md w-fit cursor-pointer p-2">
-            <ChevronLeft />
+      <Card className="w-full max-w-sm bg-white shadow-lg">
+        <CardHeader className="pb-6">
+          <div className="flex items-center border border-gray-200 rounded-md w-fit cursor-pointer p-2 hover:bg-gray-50 transition-colors">
+            <ChevronLeft className="w-4 h-4" />
           </div>
-          <CardTitle className="mt-[30px] text-[24px]">Log in</CardTitle>
-          <CardDescription>
+          <CardTitle className="mt-6 text-2xl font-bold text-gray-900">
+            Log in
+          </CardTitle>
+          <CardDescription className="text-gray-600 text-base">
             Log in to enjoy your favorite dishes.
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
-            <div className="flex flex-col gap-6">
-              <div className="grid gap-2">
+        <CardContent className="pb-6">
+          <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
+            <div className="space-y-4">
+              <div className="space-y-2">
                 <Input
                   {...register("email")}
                   id="email"
                   type="email"
                   placeholder="Enter your email address"
-                  className={`${errors.email ? " border border-red-400" : ""}`}
+                  className={`h-12 px-4 text-base border ${
+                    errors.email
+                      ? "border-red-500 focus:border-red-500"
+                      : "border-gray-300 focus:border-gray-900"
+                  } focus:ring-1 focus:ring-gray-900 rounded-lg transition-colors`}
                 />
+                {errors.email && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.email.message}
+                  </p>
+                )}
               </div>
-              {errors.email && (
-                <p className="text-red-500">{errors.email.message}</p>
-              )}
-              <div className="grid gap-2">
+
+              <div className="space-y-2">
                 <Input
                   {...register("password")}
                   id="password"
                   type="password"
                   placeholder="Password"
+                  className={`h-12 px-4 text-base border ${
+                    errors.password
+                      ? "border-red-500 focus:border-red-500"
+                      : "border-gray-300 focus:border-gray-900"
+                  } focus:ring-1 focus:ring-gray-900 rounded-lg transition-colors`}
                 />
+                {errors.password && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.password.message}
+                  </p>
+                )}
               </div>
-              {errors.password && (
-                <p className="text-red-500">{errors.password.message}</p>
-              )}
             </div>
-            <Button type="submit" className="w-full bg-gray-300">
+
+            <Button
+              type="submit"
+              className={`w-full h-12 text-base font-medium rounded-lg transition-colors ${
+                hasValidData
+                  ? "bg-gray-900 text-white hover:bg-gray-800"
+                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
+              }`}
+              disabled={!hasValidData}
+            >
               Let's Go
             </Button>
-            <Link
-              href="reset-password"
-              className=" text-sm underline-offset-4 hover:underline text-[#71717A]"
-            >
-              Forgot password?
-            </Link>
+
+            <div className="text-center">
+              <Link
+                href="reset-password"
+                className="text-blue-600 text-sm underline-offset-4 hover:underline"
+              >
+                Forgot password?
+              </Link>
+            </div>
           </form>
         </CardContent>
-        <CardFooter className="flex-col gap-2">
+        <CardFooter className="flex-col gap-2 pt-0">
           <div className="flex items-center gap-2">
-            <span className="text-[#71717A]">Don't have an account?</span>
-            <Link href="/user/sign-up" className="text-primary hover:underline">
+            <span className="text-gray-600 text-sm">
+              Don't have an account?
+            </span>
+            <Link
+              href="/user/sign-up"
+              className="text-blue-600 text-sm hover:underline font-medium"
+            >
               Sign up
             </Link>
           </div>

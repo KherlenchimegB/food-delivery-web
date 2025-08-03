@@ -2,19 +2,35 @@ import jwt from "jsonwebtoken";
 import { User } from "../models/user.models.js";
 
 const verifyToken = async (request: any, response: any, next: any) => {
-  const token = request.header("Authorization");
+  const authHeader = request.header("Authorization");
+  
+  console.log("=== AUTH DEBUG ===");
+  console.log("Auth header:", authHeader);
+  console.log("Auth header type:", typeof authHeader);
+  console.log("Auth header length:", authHeader?.length);
+  
+  if (!authHeader) {
+    console.log("No Authorization header");
+    return response.status(401).json({ error: "Access denied - No token" });
+  }
 
-  const user = await User.findOne(request.userId);
-
-  console.log("user", user);
-
-  if (!token) return response.status(401).json({ error: "Access denied" });
+  // Bearer token-ийг салгах
+  const token = authHeader.replace("Bearer ", "");
+  console.log("Token after Bearer removal:", token);
+  console.log("Token type:", typeof token);
+  console.log("Token length:", token?.length);
+  console.log("Token starts with:", token?.substring(0, 20));
 
   try {
     const decoded: any = jwt.verify(token, "pinecone-test");
+    console.log("Decoded token:", decoded);
+    console.log("Decoded userId:", decoded.userId);
     request.userId = decoded.userId;
     next();
   } catch (error) {
+    console.log("Token verification error:", error);
+    console.log("Error name:", error.name);
+    console.log("Error message:", error.message);
     response.status(401).json({ error: error });
   }
 };

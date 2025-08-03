@@ -1,6 +1,6 @@
 "use client";
 import { useContext, useState } from "react";
-import { LayoutDashboard, Truck } from "lucide-react";
+import { LayoutDashboard, Truck, LogOut } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -12,17 +12,41 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { FoodMenu } from "@/components/admin/foodMenu";
-import { CategoryNames } from "@/components/admin/categoryNames";
 import { OrderDataTable } from "@/components/admin/adminTable/orderDataTable";
+import { useRouter } from "next/navigation";
 // import { cardContext } from "@/context/cardContext";
 
 export default function Home() {
   // const { cart, setCart } = useContext(cardContext);
+  const router = useRouter();
 
-  const [select, setSelect] = useState(1);
+  const [select, setSelect] = useState(() => {
+    // localStorage-ээс утга авах, байхгүй бол 1 (Order)
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("adminActiveTab");
+      return saved ? parseInt(saved) : 1;
+    }
+    return 1;
+  });
+
   const handleSelect = () => {
-    if (select === 1) setSelect(2);
-    else setSelect(1);
+    const newSelect = select === 1 ? 2 : 1;
+    setSelect(newSelect);
+    // localStorage-д хадгалах
+    if (typeof window !== "undefined") {
+      localStorage.setItem("adminActiveTab", newSelect.toString());
+    }
+  };
+
+  // Sign-out function
+  const handleSignOut = () => {
+    // Clear user data from localStorage
+    localStorage.removeItem("userToken");
+    localStorage.removeItem("userEmail");
+    localStorage.removeItem("adminActiveTab");
+
+    // Redirect to sign-in page
+    router.push("/user/sign-in");
   };
 
   console.log(
@@ -32,8 +56,8 @@ export default function Home() {
   );
 
   return (
-    <div className="w-screen">
-      <Sidebar>
+    <div className="flex h-screen">
+      <Sidebar className="w-64 flex-shrink-0">
         <SidebarContent>
           <SidebarGroup>
             <SidebarGroupLabel className="pt-3 h-fit">
@@ -80,11 +104,23 @@ export default function Home() {
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
+
+          {/* Sign-out button at bottom */}
+          <div className="mt-auto p-4 pb-6 flex justify-center">
+            <button
+              onClick={handleSignOut}
+              className="flex items-center gap-2 px-4 py-2 rounded-full text-base bg-black hover:bg-gray-800 text-white transition-colors"
+            >
+              <LogOut size={20} />
+              <span className="text-center">Sign out</span>
+            </button>
+          </div>
         </SidebarContent>
       </Sidebar>
-      {select === 1 && <OrderDataTable />}
-      {select === 2 && <CategoryNames />}
-      {select === 2 && <FoodMenu />}
+      <div className="flex-1 overflow-auto">
+        {select === 1 && <OrderDataTable />}
+        {select === 2 && <FoodMenu />}
+      </div>
     </div>
   );
 }

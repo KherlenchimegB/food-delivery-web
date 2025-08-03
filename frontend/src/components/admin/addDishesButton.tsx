@@ -17,7 +17,7 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { baseUrl } from "@/lib/utils";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 // Constants
 const CLOUDINARY_CONFIG = {
@@ -32,10 +32,13 @@ const addDishSchema = yup.object({
   foodName: yup.string().required("Please must enter Food name"),
   price: yup
     .number()
+    .min(0, "Price must be at least 0")
+    .max(1000, "Price must be at most 1000")
     .positive("The price must be a positive number.")
     .required("Enter price"),
   ingredients: yup.string().required("Enter the ingredients."),
   image: yup.string().required("Please insert a picture."),
+  categoryName: yup.string().required("Please select a category."),
 });
 
 type AddDishFormData = yup.InferType<typeof addDishSchema>;
@@ -61,23 +64,44 @@ export const AddDishesButton = ({
     mode: "onChange",
   });
 
-  const imageUrl = watch("image");
   const resetForm = () => {
     reset();
     setPreviewUrl("");
   };
 
+  // Form-ийн анхны утгуудыг тохируулах
+  useEffect(() => {
+    if (categoryProp) {
+      setValue("categoryName", categoryProp);
+    }
+  }, [categoryProp, setValue]);
+
   // Handle form submission
   const onSubmit = async (formData: AddDishFormData) => {
+    // Image validation
+    if (!previewUrl) {
+      toast.error("Please upload an image first.");
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
+      // Category-г автоматаар нэмэх
+      const dataToSend = {
+        ...formData,
+        image: previewUrl, // previewUrl-ийг ашиглах
+        categoryName: categoryProp || "Other Foods", // categoryProp байхгүй бол "Other Foods"
+      };
+
+      console.log("Sending data to backend:", dataToSend);
+
       const response = await fetch(`${baseUrl}food`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(dataToSend),
       });
 
       if (!response.ok) {
@@ -92,6 +116,9 @@ export const AddDishesButton = ({
       toast.success("Dish has been added successfully!");
       resetForm();
       setIsOpen(false);
+
+      // Page refresh хийх
+      window.location.reload();
     } catch (error) {
       console.error("Form submit error:", error);
       toast.error("There was an error adding food. Please try again.");
@@ -261,8 +288,9 @@ export const AddDishesButton = ({
                 {...register("price", { valueAsNumber: true })}
                 id="price"
                 type="number"
-                step="1000.0"
                 min="0"
+                max="1000"
+                step="0.01"
                 placeholder="Enter price..."
                 className={errors.price ? "border-red-400" : ""}
               />
@@ -335,7 +363,7 @@ export const AddDishesButton = ({
             <Button
               type="submit"
               className="bg-red-500 hover:bg-red-600 text-white"
-              disabled={isSubmitting || !imageUrl}
+              disabled={isSubmitting}
             >
               {isSubmitting ? "Adding..." : "Add dish"}
             </Button>

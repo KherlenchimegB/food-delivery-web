@@ -1,68 +1,110 @@
 import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
 import { useState } from "react";
-import { isSameDay } from "date-fns";
-import { DayMouseEventHandler, DayPicker } from "react-day-picker";
-import { Input } from "@/components/ui/input";
 
-// type DayMouseEventHandler = (
-//   date: Date,
-//   modifiers: Modifiers,
-//   e: MouseEvent
-// ) => void;
+interface OrderDatePickerProps {
+  onDateRangeChange?: (range: {
+    from: Date | undefined;
+    to: Date | undefined;
+  }) => void;
+}
 
-export const OrderDatePicker = () => {
-  const [value, setValue] = useState<Date[]>([]);
+export const OrderDatePicker = ({
+  onDateRangeChange,
+}: OrderDatePickerProps) => {
+  const [date, setDate] = useState<{
+    from: Date | undefined;
+    to: Date | undefined;
+  }>({
+    from: undefined,
+    to: undefined,
+  });
 
-  const handleDayClick: DayMouseEventHandler = (day, modifiers) => {
-    const newValue = [...value];
-    if (modifiers.selected) {
-      const index = value.findIndex((d) => isSameDay(day, d));
-      newValue.splice(index, 1);
+  const handleDateSelect = (selectedDate: Date | undefined) => {
+    if (!selectedDate) return;
+
+    if (!date.from || (date.from && date.to)) {
+      // First date selection or reset
+      const newDate = {
+        from: selectedDate,
+        to: undefined,
+      };
+      setDate(newDate);
+      onDateRangeChange?.(newDate);
     } else {
-      newValue.push(day);
+      // Second date selection
+      const newDate = {
+        from: date.from,
+        to: selectedDate,
+      };
+      setDate(newDate);
+      onDateRangeChange?.(newDate);
     }
-    setValue(newValue);
   };
 
-  const handleResetClick = () => setValue([]);
+  const handleClear = () => {
+    const newDate = {
+      from: undefined,
+      to: undefined,
+    };
+    setDate(newDate);
+    onDateRangeChange?.(newDate);
+  };
 
-  let footer = <>Please pick one or more days.</>;
-
-  if (value.length > 0)
-    footer = (
-      <>
-        You selected {value.length} days.{" "}
-        <button onClick={handleResetClick}>Reset</button>
-      </>
-    );
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="outline" className="border-none w-fit">
-          {/* <input type="week" placeholder="Select date range" /> */}
-          <Input type="week" />
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          className="w-[280px] justify-start text-left font-normal"
+        >
+          <CalendarIcon className="mr-2 h-4 w-4" />
+          {date.from ? (
+            date.to ? (
+              <>
+                {format(date.from, "LLL dd, y")} -{" "}
+                {format(date.to, "LLL dd, y")}
+              </>
+            ) : (
+              format(date.from, "LLL dd, y")
+            )
+          ) : (
+            <span>Pick a date range</span>
+          )}
         </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-full" align="center">
-        <DropdownMenuItem>
-          <DayPicker
-            // className="w-full gap-1.5"
-            navLayout="around"
-            mode="range"
-            onDayClick={handleDayClick}
-            modifiers={{ selected: value }}
-            footer={footer}
-            animate
-            disableNavigation={false}
-          />
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+      </PopoverTrigger>
+      <PopoverContent className="w-auto p-0" align="start">
+        <Calendar
+          initialFocus
+          mode="range"
+          defaultMonth={date.from}
+          selected={date}
+          onSelect={(range) => {
+            if (range?.from) {
+              handleDateSelect(range.from);
+            }
+            if (range?.to) {
+              handleDateSelect(range.to);
+            }
+          }}
+          numberOfMonths={2}
+        />
+        <div className="flex justify-between p-3 border-t">
+          <Button variant="outline" size="sm" onClick={handleClear}>
+            Clear
+          </Button>
+          <Button variant="outline" size="sm">
+            This week
+          </Button>
+        </div>
+      </PopoverContent>
+    </Popover>
   );
 };

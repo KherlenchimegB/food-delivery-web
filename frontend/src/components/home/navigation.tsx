@@ -13,25 +13,28 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import { id } from "date-fns/locale";
 
 export const NavigationMenu = () => {
   const router = useRouter();
-  // const handleAddToCart = () => {
-
-  // };
-  const { userInfo } = useContext(UserContext);
+  const { userInfo, setUserInfo } = useContext(UserContext);
   const [openCart, setOpenCart] = useState(false);
+  const [deliveryAddress, setDeliveryAddress] = useState(""); // Added
+
   const signOut = () => {
+    localStorage.removeItem("token");
     localStorage.removeItem("email");
+    setUserInfo({ email: "" });
+    router.push("/");
   };
+
   return (
-    <div className="w-full h-[68px] fixed top-0 z-50 bg-black flex justify-between pl-[88px] pr-[88px] p-[10px]">
+    <div className="w-full h-[68px] fixed top-0 z-50 bg-black flex justify-between px-[88px] py-[10px]">
+      {/* Зүүн тал - Logo */}
       <div className="flex gap-2 items-center">
-        <img src="../logos/home-logo.png" alt="logo" />
-        <div className="flex-col">
+        <img src="/logos/home-logo.png" alt="logo" className="w-8 h-8" />
+        <div className="flex flex-col">
           <div>
-            <span className="text-white text-[20px] font-semibold ">Nom</span>
+            <span className="text-white text-[20px] font-semibold">Nom</span>
             <span className="text-[#EF4444] text-[20px] font-semibold">
               Nom
             </span>
@@ -40,39 +43,37 @@ export const NavigationMenu = () => {
         </div>
       </div>
 
+      {/* Баруун тал - User controls */}
       <div className="flex gap-3 items-center text-[14px]">
         {userInfo.email === "" && (
-          <div>
-            {" "}
+          <div className="flex gap-2">
             <button
-              className="w-fit p-2 bg-white border rounded-full cursor-pointer"
+              className="w-fit px-4 py-2 bg-white border rounded-full cursor-pointer hover:bg-gray-50 transition-colors"
               onClick={() => router.push("/user/sign-up")}
             >
               Sign up
             </button>
             <button
-              className="w-fit p-2 bg-[#EF4444] border border-none text-white rounded-full cursor-pointer"
+              className="w-fit px-4 py-2 bg-[#EF4444] border border-none text-white rounded-full cursor-pointer hover:bg-red-600 transition-colors"
               onClick={() => router.push("/user/sign-in")}
             >
               Log in
-            </button>{" "}
+            </button>
           </div>
         )}
+
         {userInfo.email !== "" && (
-          <div className="flex gap-3">
-            <AddressBar />
+          <div className="flex gap-3 items-center">
+            <AddressBar
+              deliveryAddress={deliveryAddress}
+              setDeliveryAddress={setDeliveryAddress}
+            />
 
             <AddToCart
-              id={""}
-              image={
-                "https://res.cloudinary.com/ddtytj1hq/image/upload/v1751622657/salad2_jfcs9t.png"
-              }
-              foodName={"Sunshine Stackers"}
-              price={25000}
-              ingredients={
-                "Fluffy pancakes stacked with fruits, cream, syrup, and powdered sugar."
-              }
-              userId={"userInfo"}
+              openCart={openCart}
+              setOpenCart={setOpenCart}
+              deliveryAddress={deliveryAddress}
+              setDeliveryAddress={setDeliveryAddress}
             />
 
             <DropdownMenu>
@@ -87,23 +88,21 @@ export const NavigationMenu = () => {
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 align="end"
-                className="w-56 bg-white border border-gray-200 shadow-lg"
+                className="w-56 bg-white border border-gray-200 shadow-lg rounded-lg"
               >
-                <DropdownMenuLabel className="font-normal">
+                <DropdownMenuLabel className="font-normal p-4">
                   <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium leading-none">Account:</p>
-                    <p className="text-xs leading-none text-gray-500">
+                    <p className="text-sm font-medium leading-none text-gray-900">
                       {userInfo.email}
                     </p>
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
-                  className="text-red-600 focus:text-red-600 focus:bg-red-50 cursor-pointer"
+                  className="text-gray-900 focus:text-gray-900 focus:bg-gray-50 cursor-pointer p-4"
                   onClick={signOut}
                 >
-                  <LogOut className="mr-2 h-4 w-4" />
-                  <span>Sign out</span>
+                  <span className="text-sm">Sign out</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -114,17 +113,27 @@ export const NavigationMenu = () => {
   );
 };
 
-export const AddressBar = () => {
+export const AddressBar = ({
+  deliveryAddress,
+  setDeliveryAddress,
+}: {
+  deliveryAddress: string;
+  setDeliveryAddress: (address: string) => void;
+}) => {
   return (
-    <div className="w-fit p-2 gap-3 flex  bg-white border border-none rounded-full items-center">
-      <MapPin color="#EF4444" absoluteStrokeWidth />
-      <span className="text-[#EF4444]">Delivery address:</span>
+    <div className="w-fit px-4 py-2 gap-3 flex bg-white border border-none rounded-full items-center shadow-sm">
+      <MapPin color="#EF4444" absoluteStrokeWidth className="w-4 h-4" />
+      <span className="text-[#EF4444] text-sm font-medium">
+        Delivery address:
+      </span>
       <input
         type="search"
-        className=" border border-none "
+        className="border border-none outline-none text-sm placeholder-gray-400 flex-1 min-w-[120px]"
         placeholder="Add Location"
+        value={deliveryAddress}
+        onChange={(e) => setDeliveryAddress(e.target.value)}
       />
-      <ChevronRight color="#18181B" absoluteStrokeWidth />
+      <ChevronRight color="#18181B" absoluteStrokeWidth className="w-4 h-4" />
     </div>
   );
 };

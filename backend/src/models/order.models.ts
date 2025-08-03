@@ -17,6 +17,7 @@ const order = new Schema(
       enum: ["PENDING", "CANCELED", "DELIVERED"],
       default: "PENDING",
     },
+    deliveryAddress: { type: String, required: true },
   },
   { timestamps: true }
 );
