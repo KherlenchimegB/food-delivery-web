@@ -1,7 +1,7 @@
 "use client";
 
 import axios from "axios";
-import { createContext, Dispatch, SetStateAction, useState } from "react";
+import { createContext, Dispatch, SetStateAction, useState, useContext } from "react";
 import { useEffect } from "react";
 import { baseUrl } from "@/lib/utils";
 
@@ -20,6 +20,15 @@ export const UserContext = createContext<UserContextProps>({
   setUserInfo: () => {},
 });
 
+// Hook for using UserContext
+export const useUser = () => {
+  const context = useContext(UserContext);
+  if (!context) {
+    throw new Error("useUser must be used within a UserContextProvider");
+  }
+  return context;
+};
+
 export const UserContextProvider = ({
   children,
 }: {
@@ -30,6 +39,7 @@ export const UserContextProvider = ({
   const getCurrentUser = async () => {
     const userToken = localStorage.getItem("token");
     const userEmail = localStorage.getItem("email");
+    const userRole = localStorage.getItem("userRole");
 
     // Token байхгүй бол user info-г хоосон болгох
     if (!userToken) {
@@ -41,8 +51,22 @@ export const UserContextProvider = ({
       const response = await axios.get(`${baseUrl}user/currentUser`, {
         headers: { Authorization: `Bearer ${userToken}` },
       });
-      setUserInfo(response.data);
+      
+      // Response-оос role-ийг авах, хэрэв байхгүй бол localStorage-аас авах
+      const userData = {
+        email: response.data.email || userEmail || "",
+        role: response.data.role || userRole || "USER"
+      };
+      
+      setUserInfo(userData);
+      
+      // localStorage-д role-ийг хадгалах
+      if (response.data.role) {
+        localStorage.setItem("userRole", response.data.role);
+      }
+      
       console.log("userInfo response.data", response.data);
+      console.log("Final userInfo", userData);
     } catch (error) {
       console.error(error);
       // API error үед ч user info-г хоосон болгох
@@ -50,6 +74,7 @@ export const UserContextProvider = ({
       // Token-г хасах
       localStorage.removeItem("token");
       localStorage.removeItem("email");
+      localStorage.removeItem("userRole");
     }
   };
 

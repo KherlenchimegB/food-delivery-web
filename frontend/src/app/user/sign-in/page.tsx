@@ -1,11 +1,15 @@
 "use client";
 import { SignInCard } from "@/components/auth/sign-in";
+import { useSearchParams } from "next/navigation";
 
 export default function Home() {
+  const searchParams = useSearchParams();
+  const email = searchParams.get('email');
+
   return (
     <div className="flex w-screen h-screen bg-gray-50">
       {/* Зүүн тал - Sign-in form */}
-      <SignInCard />
+      <SignInCard prefillEmail={email} />
 
       {/* Баруун тал - Background зураг */}
       <div className="flex-1 flex justify-center items-center p-8">

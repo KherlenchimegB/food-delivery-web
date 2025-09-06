@@ -40,6 +40,8 @@ export default function SignUpPage() {
   const router = useRouter();
   const { setUserInfo } = useContext(UserContext);
   const [isFormValid, setIsFormValid] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const {
     register,
@@ -72,9 +74,12 @@ export default function SignUpPage() {
 
       // Email localStorage-д хадгалах
       localStorage.setItem("email", formData.email);
+      
+      // Role-ийг localStorage-д хадгалах (sign-up-д USER role байна)
+      localStorage.setItem("userRole", "USER");
 
       // UserInfo-г шинэчлэх
-      setUserInfo({ email: formData.email });
+      setUserInfo({ email: formData.email, role: "USER" });
 
       router.push("/");
     } catch (error) {
@@ -128,7 +133,7 @@ export default function SignUpPage() {
                   <Input
                     {...register("password")}
                     id="password"
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     placeholder="Password"
                     required
                     className={`h-12 px-4 text-base border ${
@@ -142,13 +147,27 @@ export default function SignUpPage() {
                       {errors.password.message}
                     </p>
                   )}
+                  
+                  {/* Show password checkbox */}
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <input 
+                      type="checkbox" 
+                      id="showPassword"
+                      checked={showPassword}
+                      onChange={(e) => setShowPassword(e.target.checked)}
+                      className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                    />
+                    <label htmlFor="showPassword" className="cursor-pointer">
+                      Show password
+                    </label>
+                  </div>
                 </div>
 
                 <div className="space-y-2">
                   <Input
                     {...register("confirmPassword")}
                     id="confirm"
-                    type="password"
+                    type={showConfirmPassword ? "text" : "password"}
                     placeholder="Confirm password"
                     required
                     className={`h-12 px-4 text-base border ${
@@ -162,6 +181,20 @@ export default function SignUpPage() {
                       {errors.confirmPassword.message}
                     </p>
                   )}
+                  
+                  {/* Show confirm password checkbox */}
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <input 
+                      type="checkbox" 
+                      id="showConfirmPassword"
+                      checked={showConfirmPassword}
+                      onChange={(e) => setShowConfirmPassword(e.target.checked)}
+                      className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                    />
+                    <label htmlFor="showConfirmPassword" className="cursor-pointer">
+                      Show confirm password
+                    </label>
+                  </div>
                 </div>
               </div>
 

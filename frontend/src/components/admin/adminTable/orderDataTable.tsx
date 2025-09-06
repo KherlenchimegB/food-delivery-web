@@ -635,7 +635,7 @@ export const OrderDataTable = () => {
   }
 
   return (
-    <div className="w-full h-full p-6">
+    <div className="w-full p-6">
       {/* Header section */}
       <div className="flex justify-between items-center mb-6">
         <div>

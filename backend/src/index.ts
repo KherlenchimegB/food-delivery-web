@@ -10,21 +10,18 @@ import cors from "cors";
 
 dotenv.config();
 
+// Environment variables тохируулах
+process.env.GMAIL_USER = process.env.GMAIL_USER || 'your-email@gmail.com';
+process.env.GMAIL_APP_PASSWORD = process.env.GMAIL_APP_PASSWORD || 'your-app-password';
+process.env.FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
+process.env.NODE_ENV = process.env.NODE_ENV || 'development';
+
 mongoose.connect(process.env.MONGO_URI || "");
 
 const server = express();
 server.use(express.json());
 server.use(cors());
 
-// Debug middleware - бүх request-ийг log хийх (route-уудын өмнө)
-server.use((req, res, next) => {
-  console.log(`=== BACKEND REQUEST DEBUG ===`);
-  console.log(`Method: ${req.method}`);
-  console.log(`URL: ${req.url}`);
-  console.log(`Body:`, req.body);
-  console.log(`Headers:`, req.headers);
-  next();
-});
 
 const port = 8000;
 

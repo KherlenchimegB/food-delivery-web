@@ -24,6 +24,7 @@ import {
   DrawerDescription,
   DrawerFooter,
   DrawerHeader,
+  DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { useState, useContext } from "react";
@@ -167,9 +168,9 @@ export const AddToCart = ({
                   strokeWidth={1.25}
                   className="w-6 h-6"
                 />
-                <DrawerDescription className="text-2xl font-bold">
+                <DrawerTitle className="text-2xl font-bold">
                   Order detail
-                </DrawerDescription>
+                </DrawerTitle>
               </div>
               <DrawerClose asChild>
                 <Button variant="ghost" size="icon">
@@ -323,7 +324,10 @@ export const AddToCart = ({
                     </div>
 
                     {cartItems.length > 0 && (
-                      <OrderPlacedCard deliveryAddress={deliveryAddress} />
+                      <OrderPlacedCard 
+                        deliveryAddress={deliveryAddress} 
+                        setOpenCart={setOpenCart}
+                      />
                     )}
                   </div>
                 </Card>

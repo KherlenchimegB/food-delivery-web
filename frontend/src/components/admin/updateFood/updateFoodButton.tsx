@@ -181,8 +181,6 @@ export const UpdateDishButton = ({
   const onSubmit = async (formData: AddDishFormData) => {
     setIsSubmitting(true);
     try {
-      console.log("Updating food with data:", formData);
-
       const response = await fetch(`${baseUrl}food/${id}`, {
         method: "PATCH",
         headers: {
@@ -193,17 +191,12 @@ export const UpdateDishButton = ({
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error("Backend error:", errorText);
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const responseData = await response.json();
-      console.log("Food updated successfully:", responseData);
-
       toast.success("Dish updated successfully!");
       setIsOpen(false);
-
-      // Page refresh хийх эсвэл parent component-д мэдэгдэх
       window.location.reload();
     } catch (error) {
       console.error("Error updating food:", error);
@@ -216,12 +209,9 @@ export const UpdateDishButton = ({
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button
-          variant="outline"
-          className="w-8 h-8 bg-white hover:bg-gray-100 border-0 rounded-full flex items-center justify-center"
-        >
-          <PencilLine className="w-4 h-4 text-red-500" />
-        </Button>
+        <div className="w-full h-full flex items-center justify-center cursor-pointer">
+          <PencilLine size={16} className="text-red-500" />
+        </div>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -284,12 +274,22 @@ export const UpdateDishButton = ({
                       alt="food image"
                       className="w-full h-45 border rounded-md object-cover"
                     />
+                    {/* Remove button */}
                     <button
                       type="button"
                       onClick={handleRemoveImage}
                       className="absolute top-2 right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600"
                     >
                       <X className="w-4 h-4" />
+                    </button>
+                    
+                    {/* Change picture button */}
+                    <button
+                      type="button"
+                      onClick={() => document.getElementById("file-input")?.click()}
+                      className="absolute bottom-2 left-2 bg-white text-black px-3 py-1 rounded-md text-sm font-medium hover:bg-gray-100 shadow-md"
+                    >
+                      Change picture
                     </button>
                   </div>
                 ) : (

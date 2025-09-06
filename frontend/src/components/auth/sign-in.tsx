@@ -15,7 +15,7 @@ import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useRouter } from "next/navigation";
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { UserContext } from "@/context/userContext";
 
 import { baseUrl } from "@/lib/utils";
@@ -34,43 +34,72 @@ const signInSchema = yup.object({
 
 type SignInFormData = yup.InferType<typeof signInSchema>;
 
-export const SignInCard = () => {
+export const SignInCard = ({ prefillEmail }: { prefillEmail?: string | null }) => {
   const router = useRouter();
   const { setUserInfo } = useContext(UserContext);
   const [isFormValid, setIsFormValid] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const {
     register,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors, isValid },
   } = useForm<SignInFormData>({
     resolver: yupResolver(signInSchema),
     mode: "onChange",
+    defaultValues: {
+      email: prefillEmail || "",
+    },
   });
 
   // Form-ийн утгуудыг хянах
   const watchedFields = watch();
   const hasValidData = watchedFields.email && watchedFields.password;
 
+  // prefillEmail өөрчлөгдөх үед form-г шинэчлэх
+  useEffect(() => {
+    if (prefillEmail) {
+      setValue("email", prefillEmail);
+    }
+  }, [prefillEmail, setValue]);
+
   const onSubmit = async (formData: SignInFormData) => {
     try {
       const response = await axios.post(`${baseUrl}user/sign-in`, formData);
-      localStorage.setItem("token", response.data.token);
-      localStorage.setItem("email", formData.email);
-
+      
       console.log("=== SIGN-IN DEBUG ===");
       console.log("Response data:", response.data);
-      console.log("User role:", response.data.user?.role);
-      console.log("Is admin:", response.data.user?.role === "ADMIN");
+      console.log("Token from response:", response.data.token);
+      console.log("Token type:", typeof response.data.token);
+      console.log("Token length:", response.data.token?.length);
+      
+      // Token шалгах
+      if (!response.data.token) {
+        console.error("No token received from backend");
+        alert("Login failed: No token received");
+        return;
+      }
+      
+      localStorage.setItem("token", response.data.token);
+      localStorage.setItem("email", formData.email);
+      
+      // Role-ийг localStorage-д хадгалах
+      const userRole = response.data.user?.role || "USER";
+      localStorage.setItem("userRole", userRole);
+
+      console.log("User role:", userRole);
+      console.log("Is admin:", userRole === "ADMIN");
+      console.log("Token stored in localStorage:", localStorage.getItem("token"));
 
       // UserInfo-г шинэчлэх (role мэдээлэлтэй)
       setUserInfo({
         email: formData.email,
-        role: response.data.user?.role || "USER",
+        role: userRole,
       });
 
       // Role шалгаж, admin бол admin page рүү үсэрдэх
-      if (response.data.user?.role === "ADMIN") {
+      if (userRole === "ADMIN") {
         console.log("Redirecting to admin page");
         router.push("/admin");
       } else {
@@ -125,7 +154,7 @@ export const SignInCard = () => {
                 <Input
                   {...register("password")}
                   id="password"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   placeholder="Password"
                   className={`h-12 px-4 text-base border ${
                     errors.password
@@ -138,6 +167,20 @@ export const SignInCard = () => {
                     {errors.password.message}
                   </p>
                 )}
+                
+                {/* Show password checkbox */}
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <input 
+                    type="checkbox" 
+                    id="showPassword"
+                    checked={showPassword}
+                    onChange={(e) => setShowPassword(e.target.checked)}
+                    className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                  />
+                  <label htmlFor="showPassword" className="cursor-pointer">
+                    Show password
+                  </label>
+                </div>
               </div>
             </div>
 

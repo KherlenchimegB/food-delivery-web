@@ -4,7 +4,7 @@ import { UpdateDishButton } from "../admin/updateFood/updateFoodButton";
 import { useContext, useState } from "react";
 import { CartContext } from "@/context/cardContext";
 import { UserContext } from "@/context/userContext";
-import { Plus, Check } from "lucide-react";
+import { Plus, Check, Edit } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Check as CheckIcon, CircleMinus, CirclePlus } from "lucide-react";
@@ -34,22 +34,31 @@ export const HomeFoodCard = ({
   const [isOpen, setIsOpen] = useState(false);
   const [foodCount, setFoodCount] = useState(1);
   const [isAdded, setIsAdded] = useState(false);
-  const [showLoginAlert, setShowLoginAlert] = useState(false);
 
   // Тухайн хоол сагсанд байгаа эсэхийг шалгах
   const isInCart = cartItems.some((item) => item.id === id);
 
   const handleAddToCart = () => {
-    // Хэрэглэгч нэвтрээгүй байвал login шаардлагатай
+ 
     if (userInfo.email === "") {
-      setShowLoginAlert(true);
+      addToCart({
+        id: id,
+        foodName: foodName,
+        price: price,
+        image: image,
+        ingredients: ingredients,
+        userId: "guest",
+      });
+      
+      // Success notification харуулах
+      setIsAdded(true);
       setTimeout(() => {
-        setShowLoginAlert(false);
+        setIsAdded(false);
       }, 3000);
       return;
     }
-
-    // Modal нээх
+    
+    // Modal нээх (нэвтэрсэн хэрэглэгчид)
     setIsOpen(true);
   };
 
@@ -79,10 +88,58 @@ export const HomeFoodCard = ({
     }, 3000);
   };
 
+  // Админ хэсэгт зөвхөн хоолны мэдээлэл, үнэ, засах товчлуур харагдах
+  if (!isHome) {
+    return (
+      <div className="w-full bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
+        <div className="relative">
+          <div className="aspect-[4/3] relative overflow-hidden">
+            <Image
+              src={image}
+              alt="food"
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            />
+            
+            {/* Засах товчлуур - зурган дээр баруун дээд буланд */}
+            <div className="absolute bottom-4 right-4 z-10">
+              <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center cursor-pointer hover:bg-gray-100 transition-colors shadow-md">
+                <UpdateDishButton
+                  id={id}
+                  image={image}
+                  foodName={foodName}
+                  price={price}
+                  ingredients={ingredients}
+                  categoryName={categoryName}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="p-4">
+          <div className="flex justify-between items-center mb-2">
+            <h3 className="font-semibold text-lg text-gray-800">
+              {foodName}
+            </h3>
+            <span className="font-bold text-lg text-gray-900">
+              ${price.toFixed(2)}
+            </span>
+          </div>
+          
+          <p className="text-sm text-gray-600 leading-relaxed line-clamp-2">
+            {ingredients}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
-      {/* Login Alert */}
-      {showLoginAlert && (
+      {/* Login Alert
+      { (
         <div className="fixed top-[80px] left-1/2 transform -translate-x-1/2 z-[60] bg-black text-white px-4 py-2 rounded-md flex items-center gap-2 shadow-lg">
           <span className="text-sm">You need to log in first</span>
           <Button
@@ -94,7 +151,7 @@ export const HomeFoodCard = ({
             Login
           </Button>
         </div>
-      )}
+      )} */}
 
       {/* Success Notification */}
       {isAdded && (
@@ -122,32 +179,16 @@ export const HomeFoodCard = ({
                   <Check className="w-5 h-5 text-white" />
                 </div>
               ) : (
-                isHome && (
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="w-8 h-8 bg-white text-red-500 hover:bg-gray-100 border-0 rounded-full"
-                    onClick={handleAddToCart}
-                  >
-                    <Plus className="w-5 h-5" />
-                  </Button>
-                )
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="w-8 h-8 bg-white text-red-500 hover:bg-gray-100 border-0 rounded-full"
+                  onClick={handleAddToCart}
+                >
+                  <Plus className="w-5 h-5" />
+                </Button>
               )}
             </div>
-
-            {/* Update button - зурган дээр баруун дээд буланд байрлуулсан */}
-            {!isHome && (
-              <div className="absolute top-2 right-2 z-10">
-                <UpdateDishButton
-                  id={id}
-                  image={image}
-                  foodName={foodName}
-                  price={price}
-                  ingredients={ingredients}
-                  categoryName={categoryName}
-                />
-              </div>
-            )}
           </div>
 
           <div className="flex justify-between items-center mb-2">

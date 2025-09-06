@@ -23,6 +23,7 @@ export const NavigationMenu = () => {
   const signOut = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("email");
+    localStorage.removeItem("userRole");
     setUserInfo({ email: "" });
     router.push("/");
   };
@@ -46,19 +47,30 @@ export const NavigationMenu = () => {
       {/* Баруун тал - User controls */}
       <div className="flex gap-3 items-center text-[14px]">
         {userInfo.email === "" && (
-          <div className="flex gap-2">
-            <button
-              className="w-fit px-4 py-2 bg-white border rounded-full cursor-pointer hover:bg-gray-50 transition-colors"
-              onClick={() => router.push("/user/sign-up")}
-            >
-              Sign up
-            </button>
-            <button
-              className="w-fit px-4 py-2 bg-[#EF4444] border border-none text-white rounded-full cursor-pointer hover:bg-red-600 transition-colors"
-              onClick={() => router.push("/user/sign-in")}
-            >
-              Log in
-            </button>
+          <div className="flex gap-3 items-center">
+            {/* Сагсны товч - нэвтрээгүй хэрэглэгчид ч харагдана */}
+            <AddToCart
+              openCart={openCart}
+              setOpenCart={setOpenCart}
+              deliveryAddress={deliveryAddress}
+              setDeliveryAddress={setDeliveryAddress}
+            />
+            
+            {/* Sign up/Log in товчнууд */}
+            <div className="flex gap-2">
+              <button
+                className="w-fit px-4 py-2 bg-white border rounded-full cursor-pointer hover:bg-gray-50 transition-colors"
+                onClick={() => router.push("/user/sign-up")}
+              >
+                Sign up
+              </button>
+              <button
+                className="w-fit px-4 py-2 bg-[#EF4444] border border-none text-white rounded-full cursor-pointer hover:bg-red-600 transition-colors"
+                onClick={() => router.push("/user/sign-in")}
+              >
+                Log in
+              </button>
+            </div>
           </div>
         )}
 

@@ -18,6 +18,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { baseUrl } from "@/lib/utils";
 import { toast } from "sonner";
 import { useState, useEffect } from "react";
+import { Plus } from "lucide-react";
 
 // Constants
 const CLOUDINARY_CONFIG = {
@@ -45,8 +46,10 @@ type AddDishFormData = yup.InferType<typeof addDishSchema>;
 
 export const AddDishesButton = ({
   categoryProp,
+  children,
 }: {
   categoryProp?: string;
+  children?: React.ReactNode;
 }) => {
   const [previewUrl, setPreviewUrl] = useState<string>("");
   const [isOpen, setIsOpen] = useState(false);
@@ -84,17 +87,21 @@ export const AddDishesButton = ({
       return;
     }
 
+    // Form validation
+    if (!formData.foodName || !formData.price || !formData.ingredients) {
+      toast.error("Please fill in all required fields.");
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
       // Category-г автоматаар нэмэх
       const dataToSend = {
         ...formData,
-        image: previewUrl, // previewUrl-ийг ашиглах
-        categoryName: categoryProp || "Other Foods", // categoryProp байхгүй бол "Other Foods"
+        image: previewUrl,
+        categoryName: categoryProp || "Other Foods",
       };
-
-      console.log("Sending data to backend:", dataToSend);
 
       const response = await fetch(`${baseUrl}food`, {
         method: "POST",
@@ -106,18 +113,13 @@ export const AddDishesButton = ({
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error("Backend error:", errorText);
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const responseData = await response.json();
-      console.log("Backend response successful:", responseData);
-
       toast.success("Dish has been added successfully!");
       resetForm();
       setIsOpen(false);
-
-      // Page refresh хийх
       window.location.reload();
     } catch (error) {
       console.error("Form submit error:", error);
@@ -247,17 +249,18 @@ export const AddDishesButton = ({
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button
-          variant="outline"
-          className="w-11 h-11 rounded-full bg-red-500 hover:bg-red-600 text-2xl text-white"
-        >
-          +
-        </Button>
+        {children || (
+          <div className="w-full h-full flex flex-col justify-center items-center cursor-pointer group">
+            <div className="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center mb-4 group-hover:bg-red-600 transition-colors">
+              <Plus size={32} className="text-white" />
+            </div>
+          </div>
+        )}
       </DialogTrigger>
 
       <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Add new Dish to Appetizers</DialogTitle>
+          <DialogTitle>Add new Dish to {categoryProp || "Appetizers"}</DialogTitle>
           <DialogDescription></DialogDescription>
         </DialogHeader>
 

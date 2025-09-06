@@ -27,11 +27,16 @@ const verifyToken = async (request: any, response: any, next: any) => {
     console.log("Decoded userId:", decoded.userId);
     request.userId = decoded.userId;
     next();
-  } catch (error) {
+  } catch (error: any) {
     console.log("Token verification error:", error);
     console.log("Error name:", error.name);
     console.log("Error message:", error.message);
-    response.status(401).json({ error: error });
+    console.log("JWT_SECRET used:", "pinecone-test");
+    response.status(401).json({ 
+      error: "Token verification failed",
+      message: error.message,
+      name: error.name 
+    });
   }
 };
 

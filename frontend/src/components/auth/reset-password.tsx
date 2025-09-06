@@ -15,8 +15,47 @@ import { Label } from "@/components/ui/label";
 
 import { baseUrl } from "@/lib/utils";
 
-export function ForgotPassword() {
+export function ForgotPassword({ onNext, onEmailChange }: { onNext: () => void; onEmailChange: (email: string) => void }) {
   const [inputEmail, setInputEmail] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!inputEmail) return;
+
+    setIsLoading(true);
+    try {
+      // Backend API call for password reset
+      const response = await fetch(`${baseUrl}user/reset-password`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email: inputEmail }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        // Development-д token localStorage-д хадгалах
+        if (data.resetToken) {
+          localStorage.setItem('resetToken', data.resetToken);
+          console.log("Reset token saved to localStorage:", data.resetToken);
+        }
+        // Email-г localStorage-д хадгалах (password reset дараа login page руу дамжуулах)
+        localStorage.setItem('resetEmail', inputEmail);
+        onEmailChange(inputEmail);
+        onNext();
+      } else {
+        const errorText = await response.text();
+        console.error("Failed to send reset email. Status:", response.status);
+        console.error("Error response:", errorText);
+      }
+    } catch (error) {
+      console.error("Error sending reset email:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="flex items-center justify-center w-2/5 h-full">
@@ -33,14 +72,14 @@ export function ForgotPassword() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form>
+          <form onSubmit={handleSubmit}>
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
                   id="email"
                   type="email"
-                  placeholder="example@gamil.com"
+                  placeholder="example@gmail.com"
                   required
                   onChange={(event) => {
                     setInputEmail(event.target.value);
@@ -54,10 +93,11 @@ export function ForgotPassword() {
         <CardFooter className="flex-col gap-2">
           <Button
             type="submit"
-            className="w-full bg-gray-300"
-            // onClick={() => createUser(user)}
+            className={`w-full ${inputEmail ? "bg-black hover:bg-gray-800" : "bg-gray-300"}`}
+            disabled={!inputEmail || isLoading}
+            onClick={handleSubmit}
           >
-            Send link
+            {isLoading ? "Sending..." : "Send link"}
           </Button>
           <div className="flex items-center">
             <span>Don't have an account?</span>
@@ -68,31 +108,75 @@ export function ForgotPassword() {
     </div>
   );
 }
-export const VerifyEmail = () => {
-  const [inputEmail, setInputEmail] = useState("");
-  const verifyUserEmail = (user: any) => {};
+export const VerifyEmail = ({ email, onNext, onBack }: { email: string; onNext: () => void; onBack: () => void }) => {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleResendEmail = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(`${baseUrl}user/reset-password`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.resetToken) {
+          localStorage.setItem('resetToken', data.resetToken);
+          console.log("Reset token resent and saved to localStorage");
+        }
+        // Email resent successfully
+        console.log("Email resent successfully");
+      } else {
+        console.error("Failed to resend email");
+      }
+    } catch (error) {
+      console.error("Error resending email:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Development-д мэйл илгээхгүйгээр шууд next step руу шилжих
+  const handleSkipEmailVerification = () => {
+    console.log("Skipping email verification in development mode");
+    onNext();
+  };
+
   return (
     <div className="flex items-center justify-center w-2/5 h-full">
       <Card className="w-full max-w-sm ">
         <CardHeader>
-          <div className="flex items-center border border-[#E4E4E7] rounded-md w-fit cursor-pointer p-2">
+          <div className="flex items-center border border-[#E4E4E7] rounded-md w-fit cursor-pointer p-2" onClick={onBack}>
             <ChevronLeft />
           </div>
           <CardTitle className="mt-[30px] text-[24px]">
             Please verify Your Email
           </CardTitle>
           <CardDescription>
-            We just sent an email to Test@gmail.com. Click the link in the email
+            We just sent an email to {email}. Click the link in the email
             to verify your account.
           </CardDescription>
         </CardHeader>
         <CardFooter className="flex-col gap-2">
           <Button
-            type="submit"
-            className="w-full "
-            // onClick={() => verifyUserEmail(user)}
+            type="button"
+            className="w-full bg-black hover:bg-gray-800"
+            onClick={handleResendEmail}
+            disabled={isLoading}
           >
-            Resend email
+            {isLoading ? "Sending..." : "Resend email"}
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full"
+            onClick={handleSkipEmailVerification}
+          >
+            Skip email verification (Development)
           </Button>
         </CardFooter>
       </Card>
@@ -100,20 +184,78 @@ export const VerifyEmail = () => {
   );
 };
 
-export function ResetPassword() {
+export function ResetPassword({ onBack }: { onBack: () => void }) {
   const [inputPassword, setInputPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [isHide, setIsHide] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  function comparePassword(user: any): void {
-    throw new Error("Function not implemented.");
-  }
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (inputPassword !== confirmPassword) {
+      console.error("Passwords do not match");
+      return;
+    }
+
+    if (inputPassword.length < 6) {
+      console.error("Password must be at least 6 characters");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      // Get token from URL or localStorage
+      const urlParams = new URLSearchParams(window.location.search);
+      const token = urlParams.get('token') || localStorage.getItem('resetToken');
+      
+      console.log("=== RESET PASSWORD DEBUG ===");
+      console.log("Token from URL:", urlParams.get('token'));
+      console.log("Token from localStorage:", localStorage.getItem('resetToken'));
+      console.log("Using token:", token);
+      
+      if (!token) {
+        console.error("No reset token found");
+        alert("No reset token found. Please start the password reset process again.");
+        return;
+      }
+
+      const response = await fetch(`${baseUrl}user/reset-password/confirm`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ 
+          token,
+          newPassword: inputPassword 
+        }),
+      });
+
+      if (response.ok) {
+        // Password reset successful
+        localStorage.removeItem('resetToken');
+        // Get email from token or localStorage
+        const userEmail = localStorage.getItem('resetEmail') || 'user@example.com';
+        localStorage.removeItem('resetEmail');
+        // Redirect to sign in page with email parameter
+        window.location.href = `/user/sign-in?email=${encodeURIComponent(userEmail)}`;
+      } else {
+        console.error("Failed to reset password");
+      }
+    } catch (error) {
+      console.error("Error resetting password:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const isFormValid = inputPassword && confirmPassword && inputPassword === confirmPassword && inputPassword.length >= 6;
 
   return (
     <div className="flex items-center justify-center w-2/5 h-full">
       <Card className="w-full max-w-sm ">
         <CardHeader>
-          <div className="flex items-center border border-[#E4E4E7] rounded-md w-fit cursor-pointer p-2">
+          <div className="flex items-center border border-[#E4E4E7] rounded-md w-fit cursor-pointer p-2" onClick={onBack}>
             <ChevronLeft />
           </div>
           <CardTitle className="mt-[30px] text-[24px]">
@@ -125,12 +267,12 @@ export function ResetPassword() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form>
+          <form onSubmit={handleSubmit}>
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
                 <Input
                   id="password"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   placeholder="Password"
                   required
                   onChange={(event) => {
@@ -142,7 +284,7 @@ export function ResetPassword() {
               <div className="grid gap-2">
                 <Input
                   id="confirm"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   placeholder="Confirm"
                   required
                   onChange={(event) => {
@@ -153,15 +295,24 @@ export function ResetPassword() {
               </div>
 
               <div className="flex items-center gap-2 text-[14px] text-[#71717A]">
-                <input type="checkbox" />
+                <input 
+                  type="checkbox" 
+                  checked={showPassword}
+                  onChange={(e) => setShowPassword(e.target.checked)}
+                />
                 <span>Show password</span>
               </div>
             </div>
           </form>
         </CardContent>
         <CardFooter className="flex-col gap-2">
-          <Button type="submit" className="w-full bg-gray-300">
-            Create password
+          <Button 
+            type="submit" 
+            className={`w-full ${isFormValid ? "bg-black hover:bg-gray-800" : "bg-gray-300"}`}
+            disabled={!isFormValid || isLoading}
+            onClick={handleSubmit}
+          >
+            {isLoading ? "Creating..." : "Create password"}
           </Button>
         </CardFooter>
       </Card>

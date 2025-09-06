@@ -33,7 +33,7 @@ export default function RootLayout({
         <UserContextProvider>
           <CartContextProvider>
             {children}
-            <Toaster />
+            <Toaster position="top-center" />
           </CartContextProvider>
         </UserContextProvider>
       </body>

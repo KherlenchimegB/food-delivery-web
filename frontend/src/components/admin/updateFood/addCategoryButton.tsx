@@ -16,6 +16,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { baseUrl } from "@/lib/utils";
 import { toast } from "sonner";
 import { useState } from "react";
+import { Plus } from "lucide-react";
 
 const addCategorySchema = yup.object({
   categoryName: yup.string().required("Please must enter Category name"),
@@ -23,7 +24,11 @@ const addCategorySchema = yup.object({
 
 type AddCategoryFormData = yup.InferType<typeof addCategorySchema>;
 
-export const AddCategoryButton = () => {
+interface AddCategoryButtonProps {
+  onCategoryAdded?: () => void;
+}
+
+export const AddCategoryButton = ({ onCategoryAdded }: AddCategoryButtonProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -40,8 +45,6 @@ export const AddCategoryButton = () => {
   const onSubmit = async (formData: AddCategoryFormData) => {
     setIsSubmitting(true);
     try {
-      console.log("Adding category:", formData);
-
       const response = await fetch(`${baseUrl}food-category`, {
         method: "POST",
         headers: {
@@ -52,19 +55,18 @@ export const AddCategoryButton = () => {
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error("Backend error:", errorText);
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const responseData = await response.json();
-      console.log("Category added successfully:", responseData);
-
       toast.success("Category added successfully!");
       setIsOpen(false);
       reset();
-
-      // Page refresh хийх эсвэл parent component-д мэдэгдэх
-      window.location.reload();
+      
+      // Callback function дуудах - зөвхөн filter хэсгийг update хийх
+      if (onCategoryAdded) {
+        onCategoryAdded();
+      }
     } catch (error) {
       console.error("Error adding category:", error);
       toast.error("Failed to add category. Please try again.");
@@ -81,12 +83,9 @@ export const AddCategoryButton = () => {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button
-          variant="outline"
-          className="w-11 h-11 rounded-full bg-red-500 hover:bg-red-600 text-2xl text-white"
-        >
-          +
-        </Button>
+        <button className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center hover:bg-red-600 transition-colors">
+          <Plus size={16} className="text-white" />
+        </button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <form onSubmit={handleSubmit(onSubmit)}>

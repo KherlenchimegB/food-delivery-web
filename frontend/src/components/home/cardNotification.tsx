@@ -13,6 +13,7 @@ import { UserContext } from "@/context/userContext";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { baseUrl } from "@/lib/utils";
+import { toast } from "sonner";
 
 export const BadgeNotif = ({ number }: { number: number }) => {
   return (
@@ -40,24 +41,29 @@ export const EmptyCard = () => {
 
 export const OrderPlacedCard = ({
   deliveryAddress,
+  setOpenCart,
 }: {
   deliveryAddress: string;
+  setOpenCart?: (open: boolean) => void;
 }) => {
   const router = useRouter();
   const { clearCart, cartItems, getTotalPrice } = useContext(CartContext);
   const { userInfo } = useContext(UserContext);
-  const [isOpen, setIsOpen] = useState(false);
+  // const [isOpen, setIsOpen] = useState(false); // Dialog арилгасан тул ашиглахгүй
   const [isLoading, setIsLoading] = useState(false);
 
   const handleCheckout = async () => {
+    // Хэрэглэгч нэвтрээгүй бол sign-in хуудас руу үсэрдэг
     if (userInfo.email === "") {
-      alert("Please log in to place an order");
+      router.push("/user/sign-in");
       return;
     }
 
     // Delivery address шалгах
     if (!deliveryAddress.trim()) {
-      alert("Please enter your delivery address");
+      toast.error("Please enter delivery address", {
+        description: "Delivery address is required to place an order.",
+      });
       return;
     }
 
@@ -87,12 +93,11 @@ export const OrderPlacedCard = ({
       console.log("Order data:", orderData);
       console.log("API URL:", `${baseUrl}food-order/`);
 
-      // Backend рүү order илгээх - endpoint засъя
+      // Backend рүү order илгээх
       const token = localStorage.getItem("token");
       console.log("Token:", token ? "Present" : "Missing");
       console.log("Token value:", token);
       console.log("Token length:", token?.length);
-      console.log("Token starts with:", token?.substring(0, 20));
 
       const response = await axios.post(`${baseUrl}food-order/`, orderData, {
         headers: {
@@ -106,9 +111,30 @@ export const OrderPlacedCard = ({
       if (response.data.success) {
         // Cart цэвэрлэх
         clearCart();
-        setIsOpen(true);
+        
+        // Success toast notification харуулах
+        toast.success("Order placed successfully!", {
+          description: "Your order has been received and will be delivered soon.",
+          duration: 3000,
+        });
+        
+        // Cart dialog хаах
+        if (setOpenCart) {
+          setOpenCart(false);
+        }
+        
+        // Order амжилттай үүссэний дараа role-оос хамааран үсэрдэг
+        setTimeout(() => {
+          if (userInfo.role === "ADMIN") {
+            router.push("/admin");
+          } else {
+            router.push("/");
+          }
+        }, 1500); // 1.5 секунд хүлээгээд үсэрдэг
       } else {
-        alert("Failed to place order. Please try again.");
+        toast.error("Order failed", {
+          description: "Please try again.",
+        });
       }
     } catch (error: any) {
       console.error("=== ORDER ERROR DEBUG ===");
@@ -121,23 +147,24 @@ export const OrderPlacedCard = ({
 
       if (error.response) {
         console.error("Error response:", error.response.data);
-        alert(
-          `Failed to place order: ${
-            error.response.data.message || "Please try again."
-          }`
-        );
+        toast.error("Order failed", {
+          description: error.response.data.message || "Please try again.",
+        });
       } else {
-        alert("Failed to place order. Please try again.");
+        toast.error("Order failed", {
+          description: "Please try again.",
+        });
       }
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleBackToHome = () => {
-    setIsOpen(false);
-    router.push("/");
-  };
+  // Dialog-г арилгаж, зөвхөн toast notification ашиглах
+  // const handleBackToHome = () => {
+  //   setIsOpen(false);
+  //   router.push("/");
+  // };
 
   return (
     <>
@@ -150,7 +177,8 @@ export const OrderPlacedCard = ({
         {isLoading ? "Processing..." : "Checkout"}
       </Button>
 
-      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      {/* Success dialog-г арилгаж, зөвхөн toast notification ашиглах */}
+      {/* <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogContent className="sm:max-w-md flex flex-col items-center p-8">
           <DialogHeader className="text-center">
             <DialogTitle className="text-2xl font-bold mb-4">
@@ -158,9 +186,7 @@ export const OrderPlacedCard = ({
             </DialogTitle>
           </DialogHeader>
           <div className="flex items-center justify-center mb-6">
-            {/* Balloon with character illustration */}
             <div className="relative">
-              {/* Red balloon with food cover icon */}
               <div className="w-32 h-32 bg-red-500 rounded-full flex items-center justify-center relative">
                 <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
                   <svg
@@ -178,10 +204,8 @@ export const OrderPlacedCard = ({
                     />
                   </svg>
                 </div>
-                {/* Balloon string */}
                 <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0.5 h-8 bg-gray-400"></div>
               </div>
-              {/* Character holding balloon */}
               <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2">
                 <div className="w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center">
                   <div className="w-6 h-6 bg-blue-500 rounded-full"></div>
@@ -200,7 +224,7 @@ export const OrderPlacedCard = ({
             </Button>
           </DialogFooter>
         </DialogContent>
-      </Dialog>
+      </Dialog> */}
     </>
   );
 };
