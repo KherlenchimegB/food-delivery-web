@@ -39,19 +39,13 @@ export function ForgotPassword({ onNext, onEmailChange }: { onNext: () => void; 
         // Development-д token localStorage-д хадгалах
         if (data.resetToken) {
           localStorage.setItem('resetToken', data.resetToken);
-          console.log("Reset token saved to localStorage:", data.resetToken);
         }
         // Email-г localStorage-д хадгалах (password reset дараа login page руу дамжуулах)
         localStorage.setItem('resetEmail', inputEmail);
         onEmailChange(inputEmail);
         onNext();
-      } else {
-        const errorText = await response.text();
-        console.error("Failed to send reset email. Status:", response.status);
-        console.error("Error response:", errorText);
       }
     } catch (error) {
-      console.error("Error sending reset email:", error);
     } finally {
       setIsLoading(false);
     }
@@ -126,15 +120,9 @@ export const VerifyEmail = ({ email, onNext, onBack }: { email: string; onNext: 
         const data = await response.json();
         if (data.resetToken) {
           localStorage.setItem('resetToken', data.resetToken);
-          console.log("Reset token resent and saved to localStorage");
         }
-        // Email resent successfully
-        console.log("Email resent successfully");
-      } else {
-        console.error("Failed to resend email");
       }
     } catch (error) {
-      console.error("Error resending email:", error);
     } finally {
       setIsLoading(false);
     }
@@ -142,7 +130,6 @@ export const VerifyEmail = ({ email, onNext, onBack }: { email: string; onNext: 
 
   // Development-д мэйл илгээхгүйгээр шууд next step руу шилжих
   const handleSkipEmailVerification = () => {
-    console.log("Skipping email verification in development mode");
     onNext();
   };
 
@@ -194,12 +181,10 @@ export function ResetPassword({ onBack }: { onBack: () => void }) {
     e.preventDefault();
     
     if (inputPassword !== confirmPassword) {
-      console.error("Passwords do not match");
       return;
     }
 
     if (inputPassword.length < 6) {
-      console.error("Password must be at least 6 characters");
       return;
     }
 
@@ -209,13 +194,7 @@ export function ResetPassword({ onBack }: { onBack: () => void }) {
       const urlParams = new URLSearchParams(window.location.search);
       const token = urlParams.get('token') || localStorage.getItem('resetToken');
       
-      console.log("=== RESET PASSWORD DEBUG ===");
-      console.log("Token from URL:", urlParams.get('token'));
-      console.log("Token from localStorage:", localStorage.getItem('resetToken'));
-      console.log("Using token:", token);
-      
       if (!token) {
-        console.error("No reset token found");
         alert("No reset token found. Please start the password reset process again.");
         return;
       }
@@ -239,11 +218,8 @@ export function ResetPassword({ onBack }: { onBack: () => void }) {
         localStorage.removeItem('resetEmail');
         // Redirect to sign in page with email parameter
         window.location.href = `/user/sign-in?email=${encodeURIComponent(userEmail)}`;
-      } else {
-        console.error("Failed to reset password");
       }
     } catch (error) {
-      console.error("Error resetting password:", error);
     } finally {
       setIsLoading(false);
     }

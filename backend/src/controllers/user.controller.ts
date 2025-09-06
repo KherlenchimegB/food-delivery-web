@@ -19,18 +19,11 @@ export const refresh = async (request: Request, response: Response) => {
 export const signIn = async (request: Request, response: Response) => {
   try {
     const { email, password } = request.body;
-    
-    console.log("=== BACKEND SIGN-IN DEBUG ===");
-    console.log("Email:", email);
-    console.log("Password provided:", password ? "Yes" : "No");
 
     // User олдох эсэхийг шалгах
     const user = await User.findOne({ email });
-    console.log("User found:", user ? "Yes" : "No");
-    console.log("User ID:", user?._id);
 
     if (!user) {
-      console.log("Authentication failed: User not found");
       return response.status(200).json({
         success: false,
         message: "not authenticated",
@@ -39,10 +32,8 @@ export const signIn = async (request: Request, response: Response) => {
 
     // Нууц үг шалгах
     const comparedPassword = await bcrypt.compare(password, user.password);
-    console.log("Password compared:", comparedPassword);
 
     if (!comparedPassword) {
-      console.log("Authentication failed: Password mismatch");
       return response.status(200).json({
         success: false,
         message: "not authenticated",
@@ -54,11 +45,6 @@ export const signIn = async (request: Request, response: Response) => {
       expiresIn: "24h",
     });
 
-    console.log("Token generated:", token ? "Yes" : "No");
-    console.log("Token length:", token?.length);
-    console.log("Token type:", typeof token);
-
-    console.log("Authentication successful");
     response.status(200).json({
       success: true,
       message: "Authenticated",
@@ -69,7 +55,6 @@ export const signIn = async (request: Request, response: Response) => {
       },
     });
   } catch (error) {
-    console.error("Sign-in error:", error);
     response.status(444).json({
       success: false,
       error: error,
@@ -138,15 +123,11 @@ export const getUser = async (req: Request, res: Response) => {
 export const requestPasswordReset = async (request: Request, response: Response) => {
   try {
     const { email } = request.body;
-    
-    console.log("=== PASSWORD RESET REQUEST ===");
-    console.log("Email:", email);
 
     // User олдох эсэхийг шалгах
     const user = await User.findOne({ email });
     
     if (!user) {
-      console.log("User not found for password reset");
       return response.status(200).json({
         success: false,
         message: "User not found",
@@ -157,14 +138,11 @@ export const requestPasswordReset = async (request: Request, response: Response)
     const resetToken = jwt.sign({ userId: user._id, email: user.email }, "pinecone-test", {
       expiresIn: "1h", // 1 цаг хүчинтэй
     });
-
-    console.log("Reset token generated for user:", user.email);
     
     // Email илгээх
     const emailResult = await sendPasswordResetEmail(user.email, resetToken);
     
     if (emailResult.success) {
-      console.log("Password reset email sent successfully");
       response.status(200).json({
         success: true,
         message: "Password reset email sent successfully",
@@ -172,7 +150,6 @@ export const requestPasswordReset = async (request: Request, response: Response)
         resetToken: process.env.NODE_ENV === 'development' ? resetToken : undefined,
       });
     } else {
-      console.error("Failed to send password reset email:", emailResult.error);
       response.status(500).json({
         success: false,
         message: "Failed to send password reset email",
@@ -180,7 +157,6 @@ export const requestPasswordReset = async (request: Request, response: Response)
       });
     }
   } catch (error) {
-    console.error("Password reset request error:", error);
     response.status(500).json({
       success: false,
       error: error,
@@ -192,10 +168,6 @@ export const requestPasswordReset = async (request: Request, response: Response)
 export const confirmPasswordReset = async (request: Request, response: Response) => {
   try {
     const { token, newPassword } = request.body;
-    
-    console.log("=== PASSWORD RESET CONFIRM ===");
-    console.log("Token provided:", token ? "Yes" : "No");
-    console.log("New password provided:", newPassword ? "Yes" : "No");
 
     if (!token || !newPassword) {
       return response.status(400).json({
@@ -208,9 +180,7 @@ export const confirmPasswordReset = async (request: Request, response: Response)
     let decoded: any;
     try {
       decoded = jwt.verify(token, "pinecone-test");
-      console.log("Token verified successfully");
     } catch (tokenError) {
-      console.log("Token verification failed:", tokenError);
       return response.status(400).json({
         success: false,
         message: "Invalid or expired token",
@@ -220,7 +190,6 @@ export const confirmPasswordReset = async (request: Request, response: Response)
     // User олох
     const user = await User.findById(decoded.userId);
     if (!user) {
-      console.log("User not found for token");
       return response.status(400).json({
         success: false,
         message: "User not found",
@@ -235,14 +204,11 @@ export const confirmPasswordReset = async (request: Request, response: Response)
     // User-ийн нууц үг шинэчлэх
     await User.findByIdAndUpdate(user._id, { password: hashedPassword });
 
-    console.log("Password updated successfully for user:", user.email);
-
     response.status(200).json({
       success: true,
       message: "Password updated successfully",
     });
   } catch (error) {
-    console.error("Password reset confirm error:", error);
     response.status(500).json({
       success: false,
       error: error,
@@ -253,8 +219,6 @@ export const confirmPasswordReset = async (request: Request, response: Response)
 // Email service тест хийх
 export const testEmail = async (request: Request, response: Response) => {
   try {
-    console.log("=== EMAIL SERVICE TEST ===");
-    
     const result = await testEmailService();
     
     if (result.success) {
@@ -271,7 +235,6 @@ export const testEmail = async (request: Request, response: Response) => {
       });
     }
   } catch (error) {
-    console.error("Email test error:", error);
     response.status(500).json({
       success: false,
       error: error,

@@ -42,7 +42,6 @@ export const CategoryDropDownMenu = ({
       const responseData = await response.json();
       setCategoryData(responseData.data);
     } catch (error) {
-      console.log("Error fetching category:", error);
     }
   };
 

@@ -68,15 +68,8 @@ export const SignInCard = ({ prefillEmail }: { prefillEmail?: string | null }) =
     try {
       const response = await axios.post(`${baseUrl}user/sign-in`, formData);
       
-      console.log("=== SIGN-IN DEBUG ===");
-      console.log("Response data:", response.data);
-      console.log("Token from response:", response.data.token);
-      console.log("Token type:", typeof response.data.token);
-      console.log("Token length:", response.data.token?.length);
-      
       // Token шалгах
       if (!response.data.token) {
-        console.error("No token received from backend");
         alert("Login failed: No token received");
         return;
       }
@@ -88,10 +81,6 @@ export const SignInCard = ({ prefillEmail }: { prefillEmail?: string | null }) =
       const userRole = response.data.user?.role || "USER";
       localStorage.setItem("userRole", userRole);
 
-      console.log("User role:", userRole);
-      console.log("Is admin:", userRole === "ADMIN");
-      console.log("Token stored in localStorage:", localStorage.getItem("token"));
-
       // UserInfo-г шинэчлэх (role мэдээлэлтэй)
       setUserInfo({
         email: formData.email,
@@ -100,16 +89,13 @@ export const SignInCard = ({ prefillEmail }: { prefillEmail?: string | null }) =
 
       // Role шалгаж, admin бол admin page рүү үсэрдэх
       if (userRole === "ADMIN") {
-        console.log("Redirecting to admin page");
         router.push("/admin");
       } else {
-        console.log("Redirecting to home page");
         router.push("/");
       }
 
       return response.data.user;
     } catch (error) {
-      console.error("Error fetching data:", error);
       throw new Error("Failed to fetch data");
     }
   };

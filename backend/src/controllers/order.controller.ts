@@ -44,7 +44,7 @@ export const createOrder = async (request: Request, response: Response) => {
         success: false,
         message: "User not found",
       });
-      return; // Added return statement
+      return;
     }
 
     const createdOrder = {
@@ -57,7 +57,6 @@ export const createOrder = async (request: Request, response: Response) => {
     const orders = await Order.create(createdOrder);
     response.json({ success: true, data: orders });
   } catch (error) {
-    console.error("Order creation error:", error);
     response.status(444).json({
       success: false,
       error: error,
@@ -101,8 +100,6 @@ export const updateOrderStatus = async (req: Request, res: Response) => {
     const { orderId } = req.params;
     const { status } = req.body;
 
-    console.log("Update order status:", { orderId, status }); // Debug log
-
     // Status validation
     const validStatuses = ["PENDING", "DELIVERED", "CANCELED"];
     if (!validStatuses.includes(status)) {
@@ -126,15 +123,12 @@ export const updateOrderStatus = async (req: Request, res: Response) => {
       });
     }
 
-    console.log("Order status updated successfully:", updatedOrder); // Debug log
-
     res.status(200).json({
       success: true,
       message: "Order status updated successfully",
       data: updatedOrder,
     });
   } catch (error) {
-    console.error("Error updating order status:", error);
     res.status(500).json({
       success: false,
       message: "Internal server error",

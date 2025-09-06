@@ -122,7 +122,6 @@ export const AddDishesButton = ({
       setIsOpen(false);
       window.location.reload();
     } catch (error) {
-      console.error("Form submit error:", error);
       toast.error("There was an error adding food. Please try again.");
     } finally {
       setIsSubmitting(false);
@@ -186,7 +185,6 @@ export const AddDishesButton = ({
           resolve(result);
         };
         reader.onerror = (error) => {
-          console.error("FileReader error:", error);
           reject(error);
         };
         reader.readAsDataURL(file);
@@ -200,7 +198,6 @@ export const AddDishesButton = ({
       setValue("image", imageUrl, { shouldValidate: true });
       toast.success("Image uploaded successfully.");
     } catch (error) {
-      console.error("Upload error:", error);
       toast.error(
         `Upload error: ${
           error instanceof Error ? error.message : "Unspecified error"

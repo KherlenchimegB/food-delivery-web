@@ -64,11 +64,7 @@ export const UserContextProvider = ({
       if (response.data.role) {
         localStorage.setItem("userRole", response.data.role);
       }
-      
-      console.log("userInfo response.data", response.data);
-      console.log("Final userInfo", userData);
     } catch (error) {
-      console.error(error);
       // API error үед ч user info-г хоосон болгох
       setUserInfo({ email: "" });
       // Token-г хасах

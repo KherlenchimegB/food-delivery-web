@@ -17,26 +17,16 @@ export const CategoryNames = () => {
   const fetchCategories = async () => {
     try {
       const response = await axios.get(`${baseUrl}food-category`);
-      console.log("Fetched categories:", response.data);
       setCategoryData(response.data.data);
     } catch (error: any) {
-      console.error(
-        "Error fetching category:",
-        error.response?.data || error.message
-      );
     }
   };
 
   const fetchFoods = async () => {
     try {
       const response = await axios.get(`${baseUrl}food`);
-      console.log("Fetched foods:", response.data);
       setFoodData(response.data.data);
     } catch (error: any) {
-      console.error(
-        "Error fetching food:",
-        error.response?.data || error.message
-      );
     }
   };
 

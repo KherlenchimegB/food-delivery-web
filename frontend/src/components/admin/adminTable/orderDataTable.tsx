@@ -211,7 +211,6 @@ export const OrderDataTable = () => {
 
       if (response.ok) {
         const responseData = await response.json();
-        console.log("Backend response:", responseData); // Debug log
 
         // Backend response format: { success: true, data: orders[] }
         const orderData: OrderData[] = responseData.data || [];
@@ -244,11 +243,8 @@ export const OrderDataTable = () => {
         }));
 
         setOrders(formattedOrders);
-      } else {
-        console.error("Failed to fetch orders");
       }
     } catch (error) {
-      console.error("Error fetching orders:", error);
     } finally {
       setLoading(false);
     }
@@ -257,8 +253,6 @@ export const OrderDataTable = () => {
   // Order status update хийх
   const handleStatusChange = async (orderId: string, newStatus: string) => {
     try {
-      console.log("Updating order status:", { orderId, newStatus }); // Debug log
-
       const response = await fetch(`${baseUrl}food-order/${orderId}/status`, {
         method: "PATCH",
         headers: {
@@ -268,16 +262,10 @@ export const OrderDataTable = () => {
       });
 
       if (response.ok) {
-        console.log("Order status updated successfully");
         // Table refresh хийх
         fetchOrders();
-      } else {
-        console.error("Failed to update order status");
-        const errorData = await response.json();
-        console.error("Error details:", errorData);
       }
     } catch (error) {
-      console.error("Error updating order status:", error);
     }
   };
 
@@ -310,17 +298,14 @@ export const OrderDataTable = () => {
         const allSuccessful = responses.every((response) => response.ok);
 
         if (allSuccessful) {
-          console.log("All selected orders updated successfully");
           // Table refresh хийх
           fetchOrders();
           // Selection clear хийх
           table.toggleAllPageRowsSelected(false);
         } else {
-          console.error("Some orders failed to update");
           alert("Зарим order update хийгдээгүй байна!");
         }
       } catch (error) {
-        console.error("Error updating bulk orders:", error);
         alert("Алдаа гарлаа!");
       }
     }
@@ -355,7 +340,6 @@ export const OrderDataTable = () => {
       const allSuccessful = responses.every((response) => response.ok);
 
       if (allSuccessful) {
-        console.log("All selected orders updated successfully");
         // Table refresh хийх
         fetchOrders();
         // Selection clear хийх
@@ -364,11 +348,9 @@ export const OrderDataTable = () => {
         setIsBulkModalOpen(false);
         setSelectedStatus("");
       } else {
-        console.error("Some orders failed to update");
         alert("Зарим order update хийгдээгүй байна!");
       }
     } catch (error) {
-      console.error("Error updating bulk orders:", error);
       alert("Алдаа гарлаа!");
     }
   };
@@ -399,18 +381,7 @@ export const OrderDataTable = () => {
     },
     {
       accessorKey: "id",
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="w-16"
-          >
-            Nº
-            <ArrowUpDown className="ml-2 h-4 w-4" />
-          </Button>
-        );
-      },
+      header: () => <div className="w-16">Nº</div>,
       cell: ({ row, table }) => {
         const rowIndex = table
           .getRowModel()
@@ -420,34 +391,14 @@ export const OrderDataTable = () => {
     },
     {
       accessorKey: "email",
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            Customer
-            <ArrowUpDown className="ml-2 h-4 w-4" />
-          </Button>
-        );
-      },
+      header: () => <div>Customer</div>,
       cell: ({ row }) => (
         <div className="lowercase">{row.getValue("email")}</div>
       ),
     },
     {
       accessorKey: "food",
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            Food
-            <ArrowUpDown className="ml-2 h-4 w-4" />
-          </Button>
-        );
-      },
+      header: () => <div>Food</div>,
       cell: ({ row }) => {
         const foods = row.getValue("food") as any[];
         const [isExpanded, setIsExpanded] = React.useState(false);
@@ -515,17 +466,7 @@ export const OrderDataTable = () => {
     },
     {
       accessorKey: "amount",
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            Total
-            <ArrowUpDown className="ml-2 h-4 w-4" />
-          </Button>
-        );
-      },
+      header: () => <div>Total</div>,
       cell: ({ row }) => {
         const amount = parseFloat(row.getValue("amount"));
         const formatted = new Intl.NumberFormat("mn-MN", {
@@ -537,20 +478,16 @@ export const OrderDataTable = () => {
     },
     {
       accessorKey: "address",
-      header: ({ column }) => {
+      header: () => <div>Delivery Address</div>,
+      cell: ({ row }) => {
+        const address = row.getValue("address") as string;
+        const truncatedAddress = address.length > 30 ? address.substring(0, 30) + "..." : address;
         return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            Delivery Address
-            <ArrowUpDown className="ml-2 h-4 w-4" />
-          </Button>
+          <div className="max-w-xs" title={address}>
+            {truncatedAddress}
+          </div>
         );
       },
-      cell: ({ row }) => (
-        <div className="max-w-xs truncate">{row.getValue("address")}</div>
-      ),
     },
     {
       accessorKey: "status",

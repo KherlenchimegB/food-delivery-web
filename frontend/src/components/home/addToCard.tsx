@@ -106,7 +106,6 @@ export const AddToCart = ({
         setOrderHistory(userOrders);
       }
     } catch (error) {
-      console.error("Error fetching order history:", error);
     } finally {
       setLoadingOrders(false);
     }

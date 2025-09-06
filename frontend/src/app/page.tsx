@@ -21,7 +21,6 @@ export default function Home() {
       const response = await axios.get(`${baseUrl}food-category`);
       setCategoryData(response.data.data);
     } catch (error) {
-      console.log("Error fetching category:", error);
     }
   };
 
@@ -30,7 +29,6 @@ export default function Home() {
       const response = await axios.get(`${baseUrl}food`);
       setFoodData(response.data.data);
     } catch (error) {
-      console.log("Error fetching food:", error);
     }
   };
 

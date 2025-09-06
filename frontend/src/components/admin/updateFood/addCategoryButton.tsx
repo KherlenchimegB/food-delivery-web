@@ -68,7 +68,6 @@ export const AddCategoryButton = ({ onCategoryAdded }: AddCategoryButtonProps) =
         onCategoryAdded();
       }
     } catch (error) {
-      console.error("Error adding category:", error);
       toast.error("Failed to add category. Please try again.");
     } finally {
       setIsSubmitting(false);

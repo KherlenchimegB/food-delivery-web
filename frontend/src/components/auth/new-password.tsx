@@ -61,9 +61,7 @@ export const NewPassword = () => {
         });
         const responseData = await response.json();
         router.push("/");
-        console.log("responseData", responseData);
       } catch (error) {
-        console.log("error", error);
       }
     }
   };

@@ -85,19 +85,8 @@ export const OrderPlacedCard = ({
         updatedAt: new Date(),
       };
 
-      console.log("=== ORDER DEBUG INFO ===");
-      console.log("User email:", userInfo.email);
-      console.log("Delivery address:", deliveryAddress);
-      console.log("Cart items:", cartItems);
-      console.log("Total price:", getTotalPrice());
-      console.log("Order data:", orderData);
-      console.log("API URL:", `${baseUrl}food-order/`);
-
       // Backend рүү order илгээх
       const token = localStorage.getItem("token");
-      console.log("Token:", token ? "Present" : "Missing");
-      console.log("Token value:", token);
-      console.log("Token length:", token?.length);
 
       const response = await axios.post(`${baseUrl}food-order/`, orderData, {
         headers: {
@@ -105,8 +94,6 @@ export const OrderPlacedCard = ({
           "Content-Type": "application/json",
         },
       });
-
-      console.log("Backend response:", response.data);
 
       if (response.data.success) {
         // Cart цэвэрлэх
@@ -137,16 +124,7 @@ export const OrderPlacedCard = ({
         });
       }
     } catch (error: any) {
-      console.error("=== ORDER ERROR DEBUG ===");
-      console.error("Error type:", typeof error);
-      console.error("Error message:", error.message);
-      console.error("Error response:", error.response);
-      console.error("Error response data:", error.response?.data);
-      console.error("Error response status:", error.response?.status);
-      console.error("Full error:", error);
-
       if (error.response) {
-        console.error("Error response:", error.response.data);
         toast.error("Order failed", {
           description: error.response.data.message || "Please try again.",
         });

@@ -32,7 +32,6 @@ const addDishSchema = yup.object({
 type AddDishFormData = yup.InferType<typeof addDishSchema>;
 
 export const AddDishesButton = () => {
-  console.log("----------- add dish huudas");
   const [previewUrl, setPreviewUrl] = useState("");
   const {
     register,
@@ -55,7 +54,6 @@ export const AddDishesButton = () => {
       });
       const responseData = await response.json();
     } catch (error) {
-      console.log("error", error);
     }
   };
 
@@ -128,7 +126,6 @@ export const AddDishesButton = () => {
                     .secure_url;
                   setPreviewUrl(secureUrl);
                   setValue("image", secureUrl);
-                  console.log(results);
                 }
               }}
               className="w-full h-[200px] border border-dashed border-gray-400 text-center"

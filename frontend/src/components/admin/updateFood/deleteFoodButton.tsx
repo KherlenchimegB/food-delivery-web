@@ -25,17 +25,14 @@ export const DeleteFoodButton = ({ foodId }: { foodId: string }) => {
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error("Backend error:", errorText);
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      console.log("Food deleted successfully");
       toast.success("Dish successfully deleted!");
 
       // Page refresh хийх
       window.location.reload();
     } catch (error) {
-      console.error("Error deleting food:", error);
       toast.error("Failed to delete dish. Please try again.");
     } finally {
       setIsDeleting(false);

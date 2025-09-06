@@ -21,7 +21,6 @@ export const useOrders = () => {
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
-      console.error('Error fetching orders:', err);
     } finally {
       setLoading(false);
     }
@@ -34,7 +33,6 @@ export const useOrders = () => {
       await fetchOrders();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update order status');
-      console.error('Error updating order status:', err);
     }
   };
 

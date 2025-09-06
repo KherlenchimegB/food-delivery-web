@@ -147,7 +147,6 @@ export const UpdateDishButton = ({
           resolve(result);
         };
         reader.onerror = (error) => {
-          console.error("FileReader error:", error);
           reject(error);
         };
         reader.readAsDataURL(file);
@@ -162,7 +161,6 @@ export const UpdateDishButton = ({
       setIsImageRemoved(false);
       toast.success("Image uploaded successfully.");
     } catch (error) {
-      console.error("Upload error:", error);
       toast.error(
         `Upload error: ${
           error instanceof Error ? error.message : "Unspecified error"
@@ -199,7 +197,6 @@ export const UpdateDishButton = ({
       setIsOpen(false);
       window.location.reload();
     } catch (error) {
-      console.error("Error updating food:", error);
       toast.error("Failed to update dish. Please try again.");
     } finally {
       setIsSubmitting(false);

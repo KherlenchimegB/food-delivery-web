@@ -17,10 +17,6 @@ export const sendPasswordResetEmail = async (email: string, resetToken: string) 
     // Development mode-д email илгээхгүйгээр зөвхөн console.log хийх
     if (process.env.NODE_ENV === 'development' && 
         (process.env.GMAIL_USER === 'your-email@gmail.com' || !process.env.GMAIL_APP_PASSWORD)) {
-      console.log('=== DEVELOPMENT MODE - EMAIL NOT SENT ===');
-      console.log('Email would be sent to:', email);
-      console.log('Reset token:', resetToken);
-      console.log('Reset URL:', `${process.env.FRONTEND_URL || 'http://localhost:3000'}/user/reset-password?token=${resetToken}`);
       return { success: true, messageId: 'development-mode' };
     }
 
@@ -58,10 +54,8 @@ export const sendPasswordResetEmail = async (email: string, resetToken: string) 
     };
 
     const result = await transporter.sendMail(mailOptions);
-    console.log('Password reset email sent successfully:', result.messageId);
     return { success: true, messageId: result.messageId };
   } catch (error) {
-    console.error('Error sending password reset email:', error);
     return { success: false, error: error };
   }
 };
@@ -72,9 +66,6 @@ export const testEmailService = async () => {
     // Development mode-д email илгээхгүйгээр зөвхөн console.log хийх
     if (process.env.NODE_ENV === 'development' && 
         (process.env.GMAIL_USER === 'your-email@gmail.com' || !process.env.GMAIL_APP_PASSWORD)) {
-      console.log('=== DEVELOPMENT MODE - TEST EMAIL NOT SENT ===');
-      console.log('Test email would be sent to:', process.env.GMAIL_USER || 'your-email@gmail.com');
-      console.log('Email service is configured but not sending emails in development mode');
       return { success: true, messageId: 'development-mode' };
     }
 
@@ -88,10 +79,8 @@ export const testEmailService = async () => {
     };
 
     const result = await transporter.sendMail(mailOptions);
-    console.log('Test email sent successfully:', result.messageId);
     return { success: true, messageId: result.messageId };
   } catch (error) {
-    console.error('Error sending test email:', error);
     return { success: false, error: error };
   }
 };
