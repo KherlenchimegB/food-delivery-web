@@ -1,6 +1,6 @@
 "use client";
 import { FoodMenu } from "@/components/admin/foodMenu";
-import { OrderDataTable } from "@/components/admin/adminTable/orderDataTable";
+import { OrderDataTable } from "@/components/admin/adminTable/OrderDataTable";
 import { useAdmin } from "@/context/adminContext";
 
 export default function Home() {

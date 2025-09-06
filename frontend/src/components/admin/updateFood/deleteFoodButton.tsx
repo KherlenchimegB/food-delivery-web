@@ -10,7 +10,7 @@ export const DeleteFoodButton = ({ foodId }: { foodId: string }) => {
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = async () => {
-    if (!confirm("Энэ хоолыг устгахдаа итгэлтэй байна уу?")) {
+    if (!confirm("Are you sure you want to delete this dish?")) {
       return;
     }
 

@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import {
-  ColumnDef,
   ColumnFiltersState,
   flexRender,
   getCoreRowModel,
@@ -12,10 +11,7 @@ import {
   SortingState,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowUpDown, Check, X, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -24,156 +20,17 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { DeliveryStatusDropDownButton } from "./statusDropDownButton";
-import { DataFoodListShow } from "./dataFoodListButton";
 import { OrderDatePicker } from "./datepicker";
-import { baseUrl } from "@/lib/utils";
+import { createTableColumns } from "./TableColumns";
+import { BulkStatusModal } from "./BulkStatusModal";
+import { useOrderData } from "./useOrderData";
+import { Payment } from "./types";
 import { useState, useEffect, useRef } from "react";
-
-// Backend-с ирэх order data-ийн төрөл
-export type OrderData = {
-  _id: string;
-  user: {
-    email: string;
-  };
-  foodOrderItems: {
-    food: {
-      _id: string;
-      foodName: string;
-      price: number;
-      image: string;
-    };
-    quantity: number;
-  }[];
-  status: "PENDING" | "CANCELED" | "DELIVERED";
-  createdAt: string;
-  deliveryAddress: string;
-};
-
-// Frontend-д харагдах төрөл
-export type Payment = {
-  id: string;
-  email: string;
-  food: {
-    id: string;
-    foodName: string;
-    count: number;
-    price: number;
-    image: string;
-  }[];
-  date: string;
-  amount: number;
-  address: string;
-  status: "PENDING" | "CANCELED" | "DELIVERED";
-  createdAt: Date; // Added for date range filtering
-};
-
-// Status badge component
-const StatusBadge = ({
-  status,
-  onStatusChange,
-}: {
-  status: string;
-  onStatusChange?: (newStatus: string) => void;
-}) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-
-  // Click outside event
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
-        setIsOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
-  const getStatusStyle = (status: string) => {
-    switch (status) {
-      case "PENDING":
-        return "bg-red-100 text-red-800 border-red-200";
-      case "DELIVERED":
-        return "bg-green-100 text-green-800 border-green-200";
-      case "CANCELED":
-        return "bg-gray-100 text-gray-800 border-gray-200";
-      default:
-        return "bg-gray-100 text-gray-800 border-gray-200";
-    }
-  };
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case "DELIVERED":
-        return <Check size={16} />;
-      case "CANCELED":
-        return <X size={16} />;
-      default:
-        return null;
-    }
-  };
-
-  const handleStatusChange = (newStatus: string) => {
-    onStatusChange?.(newStatus);
-    setIsOpen(false);
-  };
-
-  return (
-    <div className="relative" ref={dropdownRef}>
-      <div
-        className={`flex items-center gap-2 px-3 py-1 rounded-full border cursor-pointer ${getStatusStyle(
-          status
-        )}`}
-        onClick={() => setIsOpen(!isOpen)}
-      >
-        <span className="text-sm font-medium">{status}</span>
-        {getStatusIcon(status)}
-        <ChevronDown size={16} className="text-gray-500" />
-      </div>
-
-      {isOpen && (
-        <div className="absolute top-full left-0 mt-1 bg-white border rounded-md shadow-lg z-10 min-w-[120px]">
-          <div className="flex flex-col py-1">
-            <button
-              className="w-full px-3 py-2 text-left text-sm hover:bg-gray-100"
-              onClick={() => handleStatusChange("PENDING")}
-            >
-              PENDING
-            </button>
-            <button
-              className="w-full px-3 py-2 text-left text-sm hover:bg-gray-100"
-              onClick={() => handleStatusChange("DELIVERED")}
-            >
-              DELIVERED
-            </button>
-            <button
-              className="w-full px-3 py-2 text-left text-sm hover:bg-gray-100"
-              onClick={() => handleStatusChange("CANCELED")}
-            >
-              CANCELED
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-};
 
 export const OrderDataTable = () => {
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  );
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [rowSelection, setRowSelection] = React.useState({});
-  const [orders, setOrders] = React.useState<Payment[]>([]);
-  const [loading, setLoading] = React.useState(true);
   const [dateRange, setDateRange] = React.useState<{
     from: Date | undefined;
     to: Date | undefined;
@@ -181,10 +38,16 @@ export const OrderDataTable = () => {
     from: undefined,
     to: undefined,
   });
-  const [isBulkDropdownOpen, setIsBulkDropdownOpen] = useState(false);
   const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState<string>("");
   const bulkDropdownRef = useRef<HTMLDivElement>(null);
+
+  const {
+    orders,
+    loading,
+    handleStatusChange,
+    handleModalBulkStatusChange,
+  } = useOrderData();
 
   // Click outside event for bulk dropdown
   useEffect(() => {
@@ -193,7 +56,7 @@ export const OrderDataTable = () => {
         bulkDropdownRef.current &&
         !bulkDropdownRef.current.contains(event.target as Node)
       ) {
-        setIsBulkDropdownOpen(false);
+        setIsBulkModalOpen(false);
       }
     };
 
@@ -203,320 +66,8 @@ export const OrderDataTable = () => {
     };
   }, []);
 
-  // Backend-с order data татах
-  const fetchOrders = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch(`${baseUrl}food-order/`);
-
-      if (response.ok) {
-        const responseData = await response.json();
-
-        // Backend response format: { success: true, data: orders[] }
-        const orderData: OrderData[] = responseData.data || [];
-
-        // Backend data-г frontend format-руу хөрвүүлэх
-        const formattedOrders: Payment[] = orderData.map((order) => ({
-          id: order._id,
-          email: order.user?.email || "Unknown",
-          food: order.foodOrderItems.map((item) => ({
-            id: item.food._id,
-            foodName: item.food.foodName,
-            count: item.quantity,
-            price: item.food.price,
-            image: item.food.image,
-          })),
-          date: new Date(order.createdAt)
-            .toLocaleDateString("en-US", {
-              year: "numeric",
-              month: "2-digit",
-              day: "2-digit",
-            })
-            .replace(/(\d+)\/(\d+)\/(\d+)/, "$3/$1/$2"), // MM/DD/YYYY format
-          amount: order.foodOrderItems.reduce(
-            (total, item) => total + item.food.price * item.quantity,
-            0
-          ),
-          address: order.deliveryAddress || "No address",
-          status: order.status,
-          createdAt: new Date(order.createdAt), // Original date for filtering
-        }));
-
-        setOrders(formattedOrders);
-      }
-    } catch (error) {
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Order status update хийх
-  const handleStatusChange = async (orderId: string, newStatus: string) => {
-    try {
-      const response = await fetch(`${baseUrl}food-order/${orderId}/status`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ status: newStatus }),
-      });
-
-      if (response.ok) {
-        // Table refresh хийх
-        fetchOrders();
-      }
-    } catch (error) {
-    }
-  };
-
-  // Сонгосон order-уудын status-г зэрэг солих
-  const handleBulkStatusChange = async (newStatus: string) => {
-    const selectedRows = table.getFilteredSelectedRowModel().rows;
-
-    if (selectedRows.length === 0) {
-      alert("Сонгосон order байхгүй байна!");
-      return;
-    }
-
-    if (
-      confirm(
-        `${selectedRows.length} order-ын status-г ${newStatus} болгож өөрчлөх үү?`
-      )
-    ) {
-      try {
-        const updatePromises = selectedRows.map((row) =>
-          fetch(`${baseUrl}food-order/${row.original.id}/status`, {
-            method: "PATCH",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ status: newStatus }),
-          })
-        );
-
-        const responses = await Promise.all(updatePromises);
-        const allSuccessful = responses.every((response) => response.ok);
-
-        if (allSuccessful) {
-          // Table refresh хийх
-          fetchOrders();
-          // Selection clear хийх
-          table.toggleAllPageRowsSelected(false);
-        } else {
-          alert("Зарим order update хийгдээгүй байна!");
-        }
-      } catch (error) {
-        alert("Алдаа гарлаа!");
-      }
-    }
-  };
-
-  // Modal-аас bulk status change хийх
-  const handleModalBulkStatusChange = async () => {
-    if (!selectedStatus) {
-      alert("Status сонгоно уу!");
-      return;
-    }
-
-    const selectedRows = table.getFilteredSelectedRowModel().rows;
-
-    if (selectedRows.length === 0) {
-      alert("Сонгосон order байхгүй байна!");
-      return;
-    }
-
-    try {
-      const updatePromises = selectedRows.map((row) =>
-        fetch(`${baseUrl}food-order/${row.original.id}/status`, {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ status: selectedStatus }),
-        })
-      );
-
-      const responses = await Promise.all(updatePromises);
-      const allSuccessful = responses.every((response) => response.ok);
-
-      if (allSuccessful) {
-        // Table refresh хийх
-        fetchOrders();
-        // Selection clear хийх
-        table.toggleAllPageRowsSelected(false);
-        // Modal хаах
-        setIsBulkModalOpen(false);
-        setSelectedStatus("");
-      } else {
-        alert("Зарим order update хийгдээгүй байна!");
-      }
-    } catch (error) {
-      alert("Алдаа гарлаа!");
-    }
-  };
-
-  // Columns definition
-  const columns: ColumnDef<Payment>[] = [
-    {
-      id: "select",
-      header: ({ table }) => (
-        <Checkbox
-          checked={
-            table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() && "indeterminate")
-          }
-          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-          aria-label="Select all"
-        />
-      ),
-      cell: ({ row }) => (
-        <Checkbox
-          checked={row.getIsSelected()}
-          onCheckedChange={(value) => row.toggleSelected(!!value)}
-          aria-label="Select row"
-        />
-      ),
-      enableSorting: false,
-      enableHiding: false,
-    },
-    {
-      accessorKey: "id",
-      header: () => <div className="w-16">Nº</div>,
-      cell: ({ row, table }) => {
-        const rowIndex = table
-          .getRowModel()
-          .rows.findIndex((r) => r.id === row.id);
-        return <div className="font-medium w-16">{rowIndex + 1}</div>;
-      },
-    },
-    {
-      accessorKey: "email",
-      header: () => <div>Customer</div>,
-      cell: ({ row }) => (
-        <div className="lowercase">{row.getValue("email")}</div>
-      ),
-    },
-    {
-      accessorKey: "food",
-      header: () => <div>Food</div>,
-      cell: ({ row }) => {
-        const foods = row.getValue("food") as any[];
-        const [isExpanded, setIsExpanded] = React.useState(false);
-
-        return (
-          <div className="flex flex-col gap-1">
-            {!isExpanded ? (
-              // Collapsed view - "X foods" + dropdown
-              <div className="flex items-center gap-2">
-                <span className="text-sm">{foods.length} foods</span>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setIsExpanded(true)}
-                  className="h-4 w-4 p-0"
-                >
-                  <ChevronDown size={12} />
-                </Button>
-              </div>
-            ) : (
-              // Expanded view - individual food items
-              <div className="flex flex-col gap-1">
-                {foods.map((food, index) => (
-                  <div key={index} className="flex items-center gap-2">
-                    <img
-                      src={food.image}
-                      alt={food.foodName}
-                      className="w-6 h-6 rounded object-cover"
-                    />
-                    <span className="text-sm">
-                      {food.foodName} x{food.count}
-                    </span>
-                  </div>
-                ))}
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setIsExpanded(false)}
-                  className="h-4 w-4 p-0 self-start"
-                >
-                  <ChevronDown size={12} className="rotate-180" />
-                </Button>
-              </div>
-            )}
-          </div>
-        );
-      },
-    },
-    {
-      accessorKey: "date",
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            Date
-            <ArrowUpDown className="ml-2 h-4 w-4" />
-          </Button>
-        );
-      },
-      cell: ({ row }) => (
-        <div className="capitalize">{row.getValue("date")}</div>
-      ),
-    },
-    {
-      accessorKey: "amount",
-      header: () => <div>Total</div>,
-      cell: ({ row }) => {
-        const amount = parseFloat(row.getValue("amount"));
-        const formatted = new Intl.NumberFormat("mn-MN", {
-          style: "currency",
-          currency: "MNT",
-        }).format(amount);
-        return <div className="text-center font-medium">{formatted}</div>;
-      },
-    },
-    {
-      accessorKey: "address",
-      header: () => <div>Delivery Address</div>,
-      cell: ({ row }) => {
-        const address = row.getValue("address") as string;
-        const truncatedAddress = address.length > 30 ? address.substring(0, 30) + "..." : address;
-        return (
-          <div className="max-w-xs" title={address}>
-            {truncatedAddress}
-          </div>
-        );
-      },
-    },
-    {
-      accessorKey: "status",
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            Delivery state
-            <ArrowUpDown className="ml-2 h-4 w-4" />
-          </Button>
-        );
-      },
-      cell: ({ row }) => (
-        <StatusBadge
-          status={row.getValue("status")}
-          onStatusChange={(newStatus) =>
-            handleStatusChange(row.original.id, newStatus)
-          }
-        />
-      ),
-    },
-  ];
-
-  // Component mount хийхэд data татах
-  React.useEffect(() => {
-    fetchOrders();
-  }, []);
+  // Create columns with the handleStatusChange function
+  const columns = React.useMemo(() => createTableColumns({ handleStatusChange }), [handleStatusChange]);
 
   // Date range filter function
   const filteredOrders = React.useMemo(() => {
@@ -540,7 +91,7 @@ export const OrderDataTable = () => {
   }, [orders, dateRange]);
 
   const table = useReactTable({
-    data: filteredOrders, // Use filtered orders instead of all orders
+    data: filteredOrders,
     columns: columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -560,6 +111,22 @@ export const OrderDataTable = () => {
       },
     },
   });
+
+  const handleModalConfirm = async () => {
+    const selectedRows = table.getFilteredSelectedRowModel().rows;
+    await handleModalBulkStatusChange(selectedStatus, selectedRows);
+    
+    // Selection clear хийх
+    table.toggleAllPageRowsSelected(false);
+    // Modal хаах
+    setIsBulkModalOpen(false);
+    setSelectedStatus("");
+  };
+
+  const handleModalClose = () => {
+    setIsBulkModalOpen(false);
+    setSelectedStatus("");
+  };
 
   if (loading) {
     return (
@@ -602,74 +169,14 @@ export const OrderDataTable = () => {
       </div>
 
       {/* Bulk Status Change Modal */}
-      {isBulkModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center z-50">
-          <div className="bg-gray-200 rounded-lg p-6 w-96 max-w-md shadow-lg">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold">Change delivery state</h2>
-              <button
-                onClick={() => {
-                  setIsBulkModalOpen(false);
-                  setSelectedStatus("");
-                }}
-                className="text-gray-500 hover:text-gray-700"
-              >
-                <X size={20} />
-              </button>
-            </div>
-
-            <div className="mb-6">
-              <p className="text-gray-600 mb-4">
-                You are about to change the status of{" "}
-                {table.getFilteredSelectedRowModel().rows.length} selected
-                orders.
-              </p>
-
-              <div className="flex gap-2">
-                <button
-                  className={`flex-1 py-2 px-4 rounded-full border ${
-                    selectedStatus === "DELIVERED"
-                      ? "bg-purple-100 text-purple-700 border-purple-300"
-                      : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
-                  }`}
-                  onClick={() => setSelectedStatus("DELIVERED")}
-                >
-                  Delivered
-                </button>
-                <button
-                  className={`flex-1 py-2 px-4 rounded-full border ${
-                    selectedStatus === "PENDING"
-                      ? "bg-purple-100 text-purple-700 border-purple-300"
-                      : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
-                  }`}
-                  onClick={() => setSelectedStatus("PENDING")}
-                >
-                  Pending
-                </button>
-                <button
-                  className={`flex-1 py-2 px-4 rounded-full border ${
-                    selectedStatus === "CANCELED"
-                      ? "bg-purple-100 text-purple-700 border-purple-300"
-                      : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
-                  }`}
-                  onClick={() => setSelectedStatus("CANCELED")}
-                >
-                  Cancelled
-                </button>
-              </div>
-            </div>
-
-            <div className="flex justify-end">
-              <button
-                onClick={handleModalBulkStatusChange}
-                className="bg-black text-white px-6 py-2 rounded hover:bg-gray-800 w-full"
-              >
-                Save
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <BulkStatusModal
+        isOpen={isBulkModalOpen}
+        onClose={handleModalClose}
+        selectedStatus={selectedStatus}
+        setSelectedStatus={setSelectedStatus}
+        onConfirm={handleModalConfirm}
+        table={table}
+      />
 
       {/* Table */}
       <div className="overflow-hidden rounded-md border">
@@ -763,3 +270,5 @@ export const OrderDataTable = () => {
     </div>
   );
 };
+
+// export { OrderDataTable };
