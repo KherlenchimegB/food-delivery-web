@@ -2,7 +2,7 @@
 import { ChevronRight, LogOut, MapPin, User } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { AddToCart } from "./addToCard";
-import { useContext, useState } from "react";
+import { SetStateAction, useContext, useState } from "react";
 import { UserContext } from "@/context/userContext";
 import { Button } from "../ui/button";
 import {
