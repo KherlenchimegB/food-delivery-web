@@ -86,7 +86,16 @@ export const OrderPlacedCard = ({
       };
 
       // Backend рүү order илгээх
+      // Токеныг шалгаж, байхгүй/буруу форматтай бол нэвтрэх хуудас руу үсэрнэ
       const token = localStorage.getItem("token");
+      if (!token || token === "undefined" || token === "null") {
+        toast.error("Order failed", {
+          description: "Please sign in to place an order.",
+        });
+        router.push("/user/sign-in");
+        setIsLoading(false);
+        return;
+      }
 
       const response = await axios.post(`${baseUrl}food-order/`, orderData, {
         headers: {
